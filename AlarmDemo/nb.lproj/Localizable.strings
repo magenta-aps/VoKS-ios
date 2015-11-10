@@ -1,0 +1,47 @@
+//Start Alarm View
+"tap_here_cancel" = "Trykk for å avbryte";
+"alarm_title" = "ALARM";
+"check_connection" = "Sjekk om du er tilkoblet WiFi-nettet";
+"loading_please_wait" = "Laster,\nvennligst vent";
+
+// Register view
+"register_title" = "Takk for at du installerer denne app-en. Det er lurt.";
+"register_text" = "Logg inn med ditt vanlige brukernavn og passord";
+"login_once" = "Dette gjør du kun denne ene gangen";
+"button_login" = "Logg inn";
+"username" = "Brukernavn";
+"password" = "Passord";
+
+// Permisions view
+"permissions_title" = "Flott, du er nå innlogget";
+"permissions_text" = "App-en trenger tillatelse til å:\n* bruke kameraet\n* bruke mikrofonen\n* Motta push meldinger";
+"permissions_description" = "Du vil bli spurt om å akseptere dette";
+"permissions_once" = "Dette gjør du kun denne ene gangen";
+"button_continue" = "Fortsett";
+
+// Alarm Active View
+"button_call_police" = "Ring politiet";
+"button_hide" = "Skjul";
+"alarm_is_active" = "Alarmen er\nutløst";
+"hide_or_call" = "Skjul app-en eller ring politiet";
+"tap_to_chat" = "Kan du si noe om hendelsen?\nTrykk for å chatte";
+"tap_to_see" = "Skjermen går nå i svart. Trykk for å komme tilbake";
+"tap_to_hide" = "Trykk here for å skjule app-en";
+"button_send" = "Send";
+"type_message" = "Skriv melding";
+
+
+// Chat messages
+"connecting_to_shelter" = "Kobler til krisesenteret";
+"connected_to_shelter" = "Forbindelsen til krisesenteret ok";
+"connection_lost" = "Forbindelsen avbrutt";
+//"unable_to_connect" = "Ikke mulig å koble til krisesenteret. Vent…";
+"calling_crisis_team" = "Ringer krisesenteret. Vent…";
+"call_crisis_team_ended" = "Samtalen er avsluttet";
+"crisis_team_answered" = "Krisesenteret svarte";
+"crisis_team_resumed" = "Krisesenteret gjenopptok samtalen";
+"crisis_team_hold" = "Krisesenteret satt samtalen på vent";
+"crisis_team_chat" = "Krisesenteret:\n";
+"audio_connection_lost" = "Mistet lydforbindelsen";
+"audio_connection_recreated" = "Lydforbindelsen gjenopprettet";
+"got_it_button" = "Skjønner!";

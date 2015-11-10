@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="MessageCell" rowHeight="93" id="KGk-i7-Jjw" customClass="MessageCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="93"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" placeholderIntrinsicWidth="250" placeholderIntrinsicHeight="43" translatesAutoresizingMaskIntoConstraints="NO" id="JNT-JL-AVm">
+                        <rect key="frame" x="0.0" y="5" width="250" height="67"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="250" placeholderIntrinsicHeight="82" image="chat_left.png" translatesAutoresizingMaskIntoConstraints="NO" id="Ejx-U5-6KH">
+                                <rect key="frame" x="0.0" y="0.0" width="250" height="82"/>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" placeholderIntrinsicWidth="234" placeholderIntrinsicHeight="13" text="asd asd asd as sa dsa dasd asd asd asd as dasd asd asd asd asd" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SuH-bE-QCo">
+                                <rect key="frame" x="8" y="10" width="234" height="47"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="Ejx-U5-6KH" firstAttribute="trailing" secondItem="JNT-JL-AVm" secondAttribute="trailing" id="CuV-eE-Q3W"/>
+                            <constraint firstItem="Ejx-U5-6KH" firstAttribute="top" secondItem="JNT-JL-AVm" secondAttribute="top" id="Daz-t5-QcR"/>
+                            <constraint firstAttribute="trailing" secondItem="SuH-bE-QCo" secondAttribute="trailing" constant="8" id="ISb-lh-z5o"/>
+                            <constraint firstItem="SuH-bE-QCo" firstAttribute="leading" secondItem="JNT-JL-AVm" secondAttribute="leading" constant="8" id="OeS-AE-VHq"/>
+                            <constraint firstAttribute="bottom" secondItem="SuH-bE-QCo" secondAttribute="bottom" constant="10" id="OxW-on-fvU"/>
+                            <constraint firstItem="SuH-bE-QCo" firstAttribute="top" secondItem="JNT-JL-AVm" secondAttribute="top" constant="10" id="tZb-ur-HQ8"/>
+                            <constraint firstItem="Ejx-U5-6KH" firstAttribute="leading" secondItem="JNT-JL-AVm" secondAttribute="leading" id="tgG-dq-mAU"/>
+                            <constraint firstItem="Ejx-U5-6KH" firstAttribute="bottom" secondItem="JNT-JL-AVm" secondAttribute="bottom" constant="15" id="vxS-dC-JNO"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                <constraints>
+                    <constraint firstItem="JNT-JL-AVm" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="5" id="B3b-u9-DRg"/>
+                    <constraint firstItem="JNT-JL-AVm" firstAttribute="trailing" relation="lessThanOrEqual" secondItem="H2p-sc-9uM" secondAttribute="trailing" constant="-5" id="aG7-Sk-iJ9"/>
+                    <constraint firstAttribute="bottom" secondItem="JNT-JL-AVm" secondAttribute="bottom" constant="20" id="jfX-OZ-vhO"/>
+                    <constraint firstItem="JNT-JL-AVm" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="mhA-rl-aJU"/>
+                </constraints>
+            </tableViewCellContentView>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+            <connections>
+                <outlet property="biggerSpaceFromLeftOrRightConstraint" destination="aG7-Sk-iJ9" id="UB8-lz-Zgy"/>
+                <outlet property="bubbleImage" destination="Ejx-U5-6KH" id="nSD-s8-fKL"/>
+                <outlet property="contentViewBottomConstraint" destination="jfX-OZ-vhO" id="9QI-c9-8eO"/>
+                <outlet property="holderBottomConstraint" destination="OxW-on-fvU" id="KVG-Eu-ol3"/>
+                <outlet property="lText" destination="SuH-bE-QCo" id="lcy-qg-zS1"/>
+                <outlet property="leftOrRightConstraintByType" destination="mhA-rl-aJU" id="4Fs-m6-vzv"/>
+                <outlet property="vBackground" destination="JNT-JL-AVm" id="jNB-vz-spq"/>
+            </connections>
+            <point key="canvasLocation" x="289" y="305.5"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="chat_left.png" width="43" height="34"/>
+    </resources>
+</document>

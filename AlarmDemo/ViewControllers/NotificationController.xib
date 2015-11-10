@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="8191" systemVersion="14F27" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="NotificationController">
+            <connections>
+                <outlet property="bubbleImage" destination="lsV-Ee-Qtf" id="nSR-Lu-ub2"/>
+                <outlet property="closeButton" destination="yod-Gy-opc" id="SB8-Ra-3Dl"/>
+                <outlet property="notificationLabel" destination="nwb-kC-8yB" id="jD8-NU-AQE"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" placeholderIntrinsicWidth="250" placeholderIntrinsicHeight="43" translatesAutoresizingMaskIntoConstraints="NO" id="REO-1F-yA1">
+                    <rect key="frame" x="0.0" y="433" width="250" height="67"/>
+                    <subviews>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="250" placeholderIntrinsicHeight="82" image="chat_left.png" translatesAutoresizingMaskIntoConstraints="NO" id="lsV-Ee-Qtf">
+                            <rect key="frame" x="0.0" y="0.0" width="250" height="82"/>
+                        </imageView>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" placeholderIntrinsicWidth="234" placeholderIntrinsicHeight="13" text="" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nwb-kC-8yB">
+                            <rect key="frame" x="8" y="10" width="234" height="47"/>
+                            <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstItem="lsV-Ee-Qtf" firstAttribute="trailing" secondItem="REO-1F-yA1" secondAttribute="trailing" id="6EK-77-DW0"/>
+                        <constraint firstItem="nwb-kC-8yB" firstAttribute="top" secondItem="REO-1F-yA1" secondAttribute="top" constant="10" id="9qv-Nx-fws"/>
+                        <constraint firstItem="nwb-kC-8yB" firstAttribute="leading" secondItem="REO-1F-yA1" secondAttribute="leading" constant="8" id="PVi-wd-SwW"/>
+                        <constraint firstItem="lsV-Ee-Qtf" firstAttribute="leading" secondItem="REO-1F-yA1" secondAttribute="leading" id="cAV-nE-ipn"/>
+                        <constraint firstAttribute="trailing" secondItem="nwb-kC-8yB" secondAttribute="trailing" constant="8" id="fH9-tj-iZH"/>
+                        <constraint firstItem="lsV-Ee-Qtf" firstAttribute="bottom" secondItem="REO-1F-yA1" secondAttribute="bottom" constant="15" id="p34-MY-7gI"/>
+                        <constraint firstAttribute="bottom" secondItem="nwb-kC-8yB" secondAttribute="bottom" constant="10" id="ued-9K-0UN"/>
+                        <constraint firstItem="lsV-Ee-Qtf" firstAttribute="top" secondItem="REO-1F-yA1" secondAttribute="top" id="voV-s1-ZIR"/>
+                    </constraints>
+                </view>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yod-Gy-opc">
+                    <rect key="frame" x="20" y="540" width="560" height="40"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="40" id="3ZW-TO-vXe"/>
+                    </constraints>
+                    <state key="normal" title="Close">
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="onCloseClick:" destination="-1" eventType="touchUpInside" id="mnv-5h-Q89"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" red="0.89803921568627454" green="0.89803921568627454" blue="0.89803921568627454" alpha="1" colorSpace="calibratedRGB"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="yod-Gy-opc" secondAttribute="bottom" constant="20" id="2CG-Nu-QHa"/>
+                <constraint firstItem="REO-1F-yA1" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="JNg-mj-LGL"/>
+                <constraint firstAttribute="trailing" secondItem="yod-Gy-opc" secondAttribute="trailing" constant="20" id="XOL-FR-1zW"/>
+                <constraint firstItem="REO-1F-yA1" firstAttribute="trailing" relation="lessThanOrEqual" secondItem="i5M-Pr-FkT" secondAttribute="trailing" constant="-5" id="dzd-Xi-oHY"/>
+                <constraint firstItem="yod-Gy-opc" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="20" id="haH-ce-Wql"/>
+                <constraint firstItem="yod-Gy-opc" firstAttribute="top" secondItem="REO-1F-yA1" secondAttribute="bottom" constant="40" id="rc3-WF-kOu"/>
+            </constraints>
+        </view>
+    </objects>
+    <resources>
+        <image name="chat_left.png" width="43" height="34"/>
+    </resources>
+</document>

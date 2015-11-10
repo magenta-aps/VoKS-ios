@@ -1,0 +1,48 @@
+//Start Alarm View
+"tap_here_cancel" = "TAP HERE TO CANCEL";
+"alarm_title" = "ALARM";
+"check_connection" = "Please, check if you are connected to Aruba Wi-Fi";
+"loading_please_wait" = "Loading,\nplease wait";
+
+// Register view
+"register_title" = "Thank you for installing";
+"register_text" = "Alarm app needs you to log in using wifi username and password.";
+"login_once" = "You only need to login in once";
+"button_login" = "Login";
+"username" = "Username";
+"password" = "Password";
+
+// Permisions view
+"permissions_title" = "Great. You are registered";
+"permissions_text" = "Alarm app needs permission to:\n* Use the camera\n* Use the microphone\n* Send you push notifications.";
+"permissions_description" = "You'll be asked to grant permission for each of these. Please answer yes to all the questions.";
+"permissions_once" = "You only need to do this once.";
+"button_continue" = "Continue";
+
+// Alarm Active View
+"button_call_police" = "Call Police";
+"button_hide" = "Hide";
+"alarm_is_active" = "ALARM IS\nACTIVE";
+"hide_or_call" = "Hide app or call the police";
+"tap_to_see" = "Tap to see chat";
+"tap_to_chat" = "Can you tell us something about the situation?\nTap here to chat";
+"tap_to_hide" = "TAP HERE TO HIDE";
+"button_send" = "Send";
+"type_message" = "Type message";
+
+
+// Chat messages
+"connecting_to_shelter" = "Connecting to shelter";
+"connected_to_shelter" = "Connected to shelter";
+"connection_lost" = "Connection lost. Waiting...";
+"unable_to_connect" = "Unable to connect. Waiting...";
+"calling_crisis_team" = "Calling Crisis Center. Waiting for answer...";
+"call_crisis_team_ended" = "Call with crisis Center ended";
+"crisis_team_answered" = "Crisis Center answered";
+"crisis_team_resumed" = "Crisis Center resumed call";
+"crisis_team_hold" = "Crisis Center hold call";
+"check_internet_connection" = "Please, check if you are connected to Aruba Wi-Fi";
+"crisis_team_chat" = "Crisis Center:\n";
+"audio_connection_lost" = "Audio connection lost";
+"audio_connection_recreated" = "Audio connection recreated";
+"got_it_button" = "GOT IT!";
