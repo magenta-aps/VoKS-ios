@@ -6,10 +6,10 @@ This project constitutes the iOS app as part of the BComeSafe alarm system. Its 
 
 
 Building the app
-________________
+----------------
 
 The project is set up as an XCode project, which must be installed in at least version 7. Several third-party library files have been omitted from the GIT repository, and must be added before compilation.
 
 How to get those third-party libs...
 
-Signing the app...
+...Signing the app...
