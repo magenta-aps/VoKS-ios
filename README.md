@@ -10,6 +10,4 @@ Building the app
 
 The project is set up as an XCode project, which must be installed in at least version 7. Several third-party library files have been omitted from the GIT repository, and must be added before compilation.
 
-How to get those third-party libs...
-
-...Signing the app...
+These dependency libraries can be downloaded from http://bcomesafe.com/static/dependencies.tar.bz2, which must be unpacked in the /AlarmDemo folder
