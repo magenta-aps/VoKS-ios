@@ -1,44 +1,24 @@
 /*
- * libjingle
- * Copyright 2014 Google Inc.
+ *  Copyright 2014 The WebRTC Project Authors. All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *  1. Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright notice,
- *     this list of conditions and the following disclaimer in the documentation
- *     and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * BComeSafe, http://bcomesafe.com
- * Copyright 2015 Magenta ApS, http://magenta.dk
- * Licensed under MPL 2.0, https://www.mozilla.org/MPL/2.0/
- * Developed in co-op with Baltic Amadeus, http://baltic-amadeus.lt
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree. An additional intellectual property rights grant can be found
+ *  in the file PATENTS.  All contributing project authors may
+ *  be found in the AUTHORS file in the root of the source tree.
  */
 
 #import "ARDWebSocketChannel.h"
 
-#import "ARDUtilities.h"
+#import "WebRTC/RTCLogging.h"
 #import "SRWebSocket.h"
-#import "AppLogger.h"
+
+#import "ARDSignalingMessage.h"
+#import "ARDUtilities.h"
 
 // TODO(tkchin): move these to a configuration object.
 static NSString const *kARDWSSMessageErrorKey = @"error";
-static NSString const *kARDWSSMessagePayloadKey = @"payload";
+static NSString const *kARDWSSMessagePayloadKey = @"msg";
 
 @interface ARDWebSocketChannel () <SRWebSocketDelegate>
 @end
@@ -51,6 +31,8 @@ static NSString const *kARDWSSMessagePayloadKey = @"payload";
 
 @synthesize delegate = _delegate;
 @synthesize state = _state;
+@synthesize roomId = _roomId;
+@synthesize clientId = _clientId;
 
 - (instancetype)initWithURL:(NSURL *)url
                     restURL:(NSURL *)restURL
@@ -58,11 +40,12 @@ static NSString const *kARDWSSMessagePayloadKey = @"payload";
   if (self = [super init]) {
     _url = url;
     _restURL = restURL;
+    _clientId =@"2B80DF35-0CFC-4541-8864-AB3A44787CA0_ios";
+      _roomId = @"1";
     _delegate = delegate;
     _socket = [[SRWebSocket alloc] initWithURL:url];
     _socket.delegate = self;
-    [[AppLogger sharedInstance] logClass:NSStringFromClass([self class])
-                                  message:@"Opening WebSocket"];
+    RTCLog(@"Opening WebSocket.");
     [_socket open];
   }
   return self;
@@ -80,17 +63,60 @@ static NSString const *kARDWSSMessagePayloadKey = @"payload";
   [_delegate channel:self didChangeState:_state];
 }
 
-- (void)sendMessage:(ARDSignalingMessage *)message {
-  NSData *data = [message JSONData];
-  if (_state == kARDSignalingChannelStateRegistered) {
-    NSString *messageString =
-        [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    [[AppLogger sharedInstance]
-        logClass:NSStringFromClass([self class])
-         message:[NSString stringWithFormat:@"C->WSS: %@", messageString]];
-    [_socket send:messageString];
+- (void)registerForRoomId:(NSString *)roomId
+                 clientId:(NSString *)clientId {
+  NSParameterAssert(roomId.length);
+  NSParameterAssert(clientId.length);
+  _roomId = roomId;
+  _clientId = clientId;
+  if (_state == kARDSignalingChannelStateOpen) {
+    [self registerWithCollider];
   }
 }
+
+-(void)sendMessage:(ARDSignalingMessage *)message {
+    NSData *data = [message JSONData];
+    if (_state == kARDSignalingChannelStateRegistered) {
+        NSString *messageString =
+        [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        RTCLogInfo(@"C->WSS: %@", messageString);
+        [_socket send:messageString];
+    }
+}
+
+//- (void)sendMessage:(ARDSignalingMessage *)message {
+//  NSParameterAssert(_clientId.length);
+//  NSParameterAssert(_roomId.length);
+//  NSData *data = [message JSONData];
+//  if (_state == kARDSignalingChannelStateRegistered) {
+//    NSString *payload =
+//        [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+//    NSDictionary *message = @{
+//      @"cmd": @"send",
+//      @"msg": payload,
+//    };
+//    NSData *messageJSONObject =
+//        [NSJSONSerialization dataWithJSONObject:message
+//                                        options:NSJSONWritingPrettyPrinted
+//                                          error:nil];
+//    NSString *messageString =
+//        [[NSString alloc] initWithData:messageJSONObject
+//                              encoding:NSUTF8StringEncoding];
+//    RTCLog(@"C->WSS: %@", messageString);
+//    [_socket send:messageString];
+//  } else {
+//    NSString *dataString =
+//        [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+//    RTCLog(@"C->WSS POST: %@", dataString);
+//    NSString *urlString =
+//        [NSString stringWithFormat:@"%@/%@/%@",
+//            [_restURL absoluteString], _roomId, _clientId];
+//    NSURL *url = [NSURL URLWithString:urlString];
+//    [NSURLConnection sendAsyncPostToURL:url
+//                               withData:data
+//                      completionHandler:nil];
+//  }
+//}
 
 - (void)disconnect {
   if (_state == kARDSignalingChannelStateClosed ||
@@ -98,95 +124,142 @@ static NSString const *kARDWSSMessagePayloadKey = @"payload";
     return;
   }
   [_socket close];
-  //  NSLog(@"C->WSS DELETE");
-  //  NSString *urlString =
-  //      [NSString stringWithFormat:@"%@/%@/%@",
-  //          [_restURL absoluteString], _roomId, _clientId];
-  //  NSURL *url = [NSURL URLWithString:urlString];
-  //  NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-  //  request.HTTPMethod = @"DELETE";
-  //  request.HTTPBody = nil;
-  //  [NSURLConnection sendAsyncRequest:request completionHandler:nil];
+  RTCLog(@"C->WSS DELETE rid:%@ cid:%@", _roomId, _clientId);
+  NSString *urlString =
+      [NSString stringWithFormat:@"%@/%@/%@",
+          [_restURL absoluteString], _roomId, _clientId];
+  NSURL *url = [NSURL URLWithString:urlString];
+  NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+  request.HTTPMethod = @"DELETE";
+  request.HTTPBody = nil;
+  [NSURLConnection sendAsyncRequest:request completionHandler:nil];
 }
 
 #pragma mark - SRWebSocketDelegate
 
 - (void)webSocketDidOpen:(SRWebSocket *)webSocket {
-  [[AppLogger sharedInstance]
-      logClass:NSStringFromClass([self class])
-       message:[NSString stringWithFormat:@"WebSocket connection opened."]];
+  RTCLog(@"WebSocket connection opened.");
   self.state = kARDSignalingChannelStateRegistered;
+//  if (_roomId.length && _clientId.length) {
+//    [self registerWithCollider];
+//  }
 }
 
 - (void)webSocket:(SRWebSocket *)webSocket didReceiveMessage:(id)message {
   NSString *messageString = message;
   NSData *messageData = [messageString dataUsingEncoding:NSUTF8StringEncoding];
-  id jsonObject =
-      [NSJSONSerialization JSONObjectWithData:messageData options:0 error:nil];
+  id jsonObject = [NSJSONSerialization JSONObjectWithData:messageData
+                                                  options:0
+                                                    error:nil];
   if (![jsonObject isKindOfClass:[NSDictionary class]]) {
-    [[AppLogger sharedInstance]
-        logClass:NSStringFromClass([self class])
-         message:[NSString
-                     stringWithFormat:@"Unexpected object: %@", jsonObject]];
+    RTCLogError(@"Unexpected message: %@", jsonObject);
     return;
   }
   NSDictionary *wssMessage = jsonObject;
   NSString *errorString = wssMessage[kARDWSSMessageErrorKey];
   if (errorString.length) {
-    [[AppLogger sharedInstance]
-        logClass:NSStringFromClass([self class])
-         message:[NSString stringWithFormat:@"WSS error: %@", errorString]];
+    RTCLogError(@"WSS error: %@", errorString);
     return;
   }
-
-  if ([[wssMessage valueForKey:@"type"] isEqualToString:@"EXPIRE"]) {
-    NSLog(@"WSS: EXPIRE message, do nothing");
-    return;
-  }
-
-  if ([[wssMessage valueForKey:@"type"] isEqualToString:@"SEND OFFER"]) {
-    NSLog(@"WSS: SEND OFFER message, do nothing for now!");
-    return;
-  }
-
-  if ([[wssMessage valueForKey:@"type"] isEqualToString:@"ERROR"]) {
-    NSLog(@"WSS: ERROR message, do nothing for now! Error: %@",
-          [wssMessage valueForKey:@"data"]);
-    return;
-  }
-  if ([[wssMessage valueForKey:@"type"]
-          isEqualToString:@"CHECK_POLICE_STATUS"]) {
-    NSLog(@"WSS: CHECK_POLICE_STATUS message, do nothing for now!");
-    return;
-  }
-
+    NSString *payload = messageString;//wssMessage[kARDWSSMessagePayloadKey];
   ARDSignalingMessage *signalingMessage =
-      [ARDSignalingMessage messageFromDictionary:wssMessage];
-  [[AppLogger sharedInstance]
-      logClass:NSStringFromClass([self class])
-       message:[NSString stringWithFormat:@"WSS->C: %@", wssMessage]];
+      [ARDSignalingMessage messageFromJSONString:payload];
+  RTCLog(@"WSS->C: %@", payload);
   [_delegate channel:self didReceiveMessage:signalingMessage];
 }
 
 - (void)webSocket:(SRWebSocket *)webSocket didFailWithError:(NSError *)error {
-  [[AppLogger sharedInstance]
-      logClass:NSStringFromClass([self class])
-       message:[NSString stringWithFormat:@"WebSocket error: %@", error]];
+  RTCLogError(@"WebSocket error: %@", error);
   self.state = kARDSignalingChannelStateError;
 }
 
 - (void)webSocket:(SRWebSocket *)webSocket
- didCloseWithCode:(NSInteger)code
-           reason:(NSString *)reason
-         wasClean:(BOOL)wasClean {
-  [[AppLogger sharedInstance]
-      logClass:NSStringFromClass([self class])
-       message:[NSString stringWithFormat:@"WebSocket closed with code: %ld "
-                                          @"reason: %@ wasClean: %d",
-                                          (long)code, reason, wasClean]];
-
+    didCloseWithCode:(NSInteger)code
+              reason:(NSString *)reason
+            wasClean:(BOOL)wasClean {
+  RTCLog(@"WebSocket closed with code: %ld reason:%@ wasClean:%d",
+      (long)code, reason, wasClean);
   NSParameterAssert(_state != kARDSignalingChannelStateError);
   self.state = kARDSignalingChannelStateClosed;
 }
 
+#pragma mark - Private
+
+- (void)registerWithCollider {
+  if (_state == kARDSignalingChannelStateRegistered) {
+    return;
+  }
+  NSParameterAssert(_roomId.length);
+  NSParameterAssert(_clientId.length);
+  NSDictionary *registerMessage = @{
+    @"cmd": @"register",
+    @"roomid" : _roomId,
+    @"clientid" : _clientId,
+  };
+  NSData *message =
+      [NSJSONSerialization dataWithJSONObject:registerMessage
+                                      options:NSJSONWritingPrettyPrinted
+                                        error:nil];
+  NSString *messageString =
+      [[NSString alloc] initWithData:message encoding:NSUTF8StringEncoding];
+  RTCLog(@"Registering on WSS for rid:%@ cid:%@", _roomId, _clientId);
+  // Registration can fail if server rejects it. For example, if the room is
+  // full.
+  [_socket send:messageString];
+  self.state = kARDSignalingChannelStateRegistered;
+}
+
 @end
+
+@interface ARDLoopbackWebSocketChannel () <ARDSignalingChannelDelegate>
+@end
+
+@implementation ARDLoopbackWebSocketChannel
+
+- (instancetype)initWithURL:(NSURL *)url restURL:(NSURL *)restURL {
+  return [super initWithURL:url restURL:restURL delegate:self];
+}
+
+#pragma mark - ARDSignalingChannelDelegate
+
+- (void)channel:(id<ARDSignalingChannel>)channel
+    didReceiveMessage:(ARDSignalingMessage *)message {
+  switch (message.type) {
+    case kARDSignalingMessageTypeOffer: {
+      // Change message to answer, send back to server.
+      ARDSessionDescriptionMessage *sdpMessage =
+          (ARDSessionDescriptionMessage *)message;
+      RTCSessionDescription *description = sdpMessage.sessionDescription;
+      NSString *dsc = description.sdp;
+      dsc = [dsc stringByReplacingOccurrencesOfString:@"offer"
+                                           withString:@"answer"];
+      RTCSessionDescription *answerDescription =
+          [[RTCSessionDescription alloc] initWithType:RTCSdpTypeAnswer sdp:dsc];
+      ARDSignalingMessage *answer =
+          [[ARDSessionDescriptionMessage alloc]
+               initWithDescription:answerDescription];
+      [self sendMessage:answer];
+      break;
+    }
+    case kARDSignalingMessageTypeAnswer:
+      // Should not receive answer in loopback scenario.
+      break;
+    case kARDSignalingMessageTypeCandidate:
+    case kARDSignalingMessageTypeCandidateRemoval:
+      // Send back to server.
+      [self sendMessage:message];
+      break;
+    case kARDSignalingMessageTypeBye:
+      // Nothing to do.
+      return;
+      default:
+          return;
+  }
+}
+
+- (void)channel:(id<ARDSignalingChannel>)channel
+    didChangeState:(ARDSignalingChannelState)state {
+}
+
+@end
+

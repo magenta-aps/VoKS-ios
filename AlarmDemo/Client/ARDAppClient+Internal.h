@@ -35,17 +35,15 @@
 #import "ARDRoomServerClient.h"
 #import "ARDSignalingChannel.h"
 #import "ARDTURNClient.h"
-#import "RTCPeerConnection.h"
-#import "RTCPeerConnectionDelegate.h"
-#import "RTCPeerConnectionFactory.h"
-#import "RTCSessionDescriptionDelegate.h"
-#import "RTCMediaStream.h"
-#import "RTCAudioTrack.h"
+#import <WebRTC/RTCPeerConnection.h>
+#import <WebRTC/RTCPeerConnectionFactory.h>
+#import <WebRTC/RTCSessionDescription.h>
+#import <WebRTC/RTCMediaStream.h>
+#import <WebRTC/RTCAudioTrack.h>
 #import "Reachability.h"
 
 @interface ARDAppClient () <
-    ARDSignalingChannelDelegate, RTCPeerConnectionDelegate,
-    RTCSessionDescriptionDelegate, RTCDataChannelDelegate>
+    ARDSignalingChannelDelegate, RTCPeerConnectionDelegate>
 
 // All properties should only be mutated from the main queue.
 @property(nonatomic, strong) id<ARDSignalingChannel> channel;
@@ -75,6 +73,10 @@
 
 @property(nonatomic, strong)
     RTCMediaConstraints *defaultPeerConnectionConstraints;
+@property(nonatomic, readonly) BOOL isLoopback;
+@property(nonatomic, readonly) BOOL isAudioOnly;
+@property(nonatomic, readonly) BOOL shouldMakeAecDump;
+@property(nonatomic, readonly) BOOL shouldUseLevelControl;
 
 @property(nonatomic, assign) BOOL localVideoState;
 @property(nonatomic, assign) BOOL peerConnectionState;

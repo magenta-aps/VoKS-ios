@@ -6,9 +6,11 @@
  */
 
 #import "AlarmController.h"
-#import "RTCAVFoundationVideoSource.h"
+#import <WebRTC/RTCAVFoundationVideoSource.h>
 #import "ARDAppClient+Internal.h"
 #import "AppLogger.h"
+#import "ARDSettingsModel.h"
+#import <WebRTC/RTCMediaConstraints.h>
 
 #define SYSTEM_VERSION_LESS_THAN(v)                                            \
   ([[[UIDevice currentDevice] systemVersion] compare:v                         \
@@ -58,6 +60,12 @@ NSString *kDataChannelTypeMessages = @"MESSAGES";
                                 message:@"viewDidLoad"];
   [super viewDidLoad];
 
+    
+//    RTCAudioSession *session = [RTCAudioSession sharedInstance];
+//    session.useManualAudio = useManualAudio;
+//    session.isAudioEnabled = NO;
+
+    
   [self prepareTexts];
 
   if ([self respondsToSelector:@selector(edgesForExtendedLayout)])
@@ -67,6 +75,8 @@ NSString *kDataChannelTypeMessages = @"MESSAGES";
   [self.navigationController.navigationBar setHidden:YES];
   // Do any additional setup after loading the view from its nib.
   _client = [[ARDAppClient alloc] initWithDelegate:self];
+   
+    
   if (_messages == nil)
     _messages = [NSMutableArray array];
   if (_queuedMessages == nil)
@@ -302,7 +312,7 @@ NSString *kDataChannelTypeMessages = @"MESSAGES";
 }
 
 - (void)appClient:(ARDAppClient *)client
-    didChangeConnectionState:(RTCICEConnectionState)state {
+    didChangeConnectionState:(RTCIceConnectionState)state {
   [[AppLogger sharedInstance]
       logClass:NSStringFromClass([self class])
        message:[NSString
@@ -408,64 +418,6 @@ NSString *kDataChannelTypeMessages = @"MESSAGES";
                                     forState:UIControlStateHighlighted];
 
   });
-}
-
-//- (void)appClient:(ARDAppClient *)client
-//    didReceivedCallState:(CallButtonState)state {
-//  switch (state) {
-//  case kCallButtonStateNone: {
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//      _shelterCallState = kShelterCallStateNone;
-//      [_callToShelterButton
-//          setBackgroundImage:[UIImage imageNamed:@"call_active"]
-//                    forState:UIControlStateNormal];
-//      [_callToShelterButton
-//          setBackgroundImage:[UIImage imageNamed:@"call_press"]
-//                    forState:UIControlStateHighlighted];
-//    });
-//    break;
-//  }
-//  case kCallButtonStateConnected: {
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//      _shelterCallState = kShelterCallStateOnHold;
-//      [_client resumeRemoteAudioStreaming];
-//      [_callToShelterButton
-//          setBackgroundImage:[UIImage imageNamed:@"drop_active"]
-//                    forState:UIControlStateNormal];
-//      [_callToShelterButton
-//          setBackgroundImage:[UIImage imageNamed:@"drop_press"]
-//                    forState:UIControlStateHighlighted];
-//
-//    });
-//    break;
-//  }
-//  case kCallButtonStateShelterOn: {
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//      _shelterCallState = kShelterCallStateAnswered;
-//      [_client resumeRemoteAudioStreaming];
-//      [_callToShelterButton
-//          setBackgroundImage:[UIImage imageNamed:@"drop_active"]
-//                    forState:UIControlStateNormal];
-//      [_callToShelterButton
-//          setBackgroundImage:[UIImage imageNamed:@"drop_press"]
-//                    forState:UIControlStateHighlighted];
-//
-//    });
-//    break;
-//  }
-//  }
-//}
-- (void)appClient:(ARDAppClient *)client
-    didChangeDataChannelState:(RTCDataChannelState)state {
-  //  if (state == kRTCDataChannelStateOpen) {
-  //    if ([_queuedMessages count]) {
-  //      for (NSString *message in _queuedMessages) {
-  //        [_client sendMessageToDataChannel:message];
-  //      }
-  //
-  //      [_queuedMessages removeAllObjects];
-  //    }
-  //  }
 }
 
 - (void)appClient:(ARDAppClient *)client
@@ -1451,10 +1403,11 @@ completion:^(BOOL finished){
                            (void (^)(NSDictionary *response))successBlock
                        failureBlock:(void (^)(NSError *error))failureBlock {
 
-  NSURLSession *session = [NSURLSession sharedSession];
-  session.configuration.timeoutIntervalForRequest = 5;
-  session.configuration.timeoutIntervalForResource = 10;
-  [[session
+    NSURLSessionConfiguration *defaultConfigObject = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *defaultSession = [NSURLSession sessionWithConfiguration: defaultConfigObject delegate: self delegateQueue: [NSOperationQueue mainQueue]];
+    defaultSession.configuration.timeoutIntervalForRequest = 5;
+    defaultSession.configuration.timeoutIntervalForResource = 10;
+  [[defaultSession
         dataTaskWithURL:
             [NSURL URLWithString:
                        [NSString
@@ -1488,6 +1441,11 @@ completion:^(BOOL finished){
         successBlock(responseDict);
 
       }] resume];
+}
+
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler
+{
+    completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
 }
 
 - (void)parseTriggerAlarmResponse:(NSDictionary *)response {

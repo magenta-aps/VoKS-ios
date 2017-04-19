@@ -15,7 +15,7 @@
 
 @interface AlarmController
     : UIViewController <UITableViewDataSource, UITableViewDelegate,
-                        UITextFieldDelegate>
+                        UITextFieldDelegate, NSURLSessionDelegate>
 
 extern NSString *kDataChannelTypeMessage;
 extern NSString *kDataChannelTypeListening;

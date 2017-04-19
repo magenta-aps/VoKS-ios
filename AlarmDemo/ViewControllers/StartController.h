@@ -8,7 +8,7 @@
 #import <UIKit/UIKit.h>
 #import "Reachability.h"
 
-@interface StartController : UIViewController <NSURLConnectionDelegate>
+@interface StartController : UIViewController <NSURLConnectionDelegate, NSURLSessionDelegate>
 
 // Connection info variable
 @property (nonatomic, retain) Reachability *connectionInfo;

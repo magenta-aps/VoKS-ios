@@ -32,15 +32,16 @@
 
 #import "ARDAppClient+Internal.h"
 
-#import "RTCICEServer.h"
-#import "RTCMediaConstraints.h"
-#import "RTCMediaStream.h"
-#import "RTCPair.h"
-#import "RTCVideoCapturer.h"
-#import "RTCAVFoundationVideoSource.h"
-#import "RTCPeerConnectionInterface.h"
+#import <WebRTC/RTCIceServer.h>
+#import <WebRTC/RTCMediaConstraints.h>
+#import <WebRTC/RTCMediaStream.h>
+#import <WebRTC/RTCAVFoundationVideoSource.h>
+#import <WebRTC/RTCConfiguration.h>
+#import <WebRTC/RTCRtpSender.h>
+#import <WebRTC/RTCTracing.h>
+#import <WebRTC/RTCFileLogger.h>
 
-#import "ARDCEODTURNClient.h"
+#import "ARDTURNClient+Internal.h"
 #import "ARDMessageResponse.h"
 #import "ARDSDPUtils.h"
 #import "ARDSignalingMessage.h"
@@ -51,13 +52,9 @@
 #import "Utils.h"
 #import "AppLogger.h"
 #import <AVFoundation/AVFoundation.h>
+#import "ARDSettingsModel.h"
 
-static NSString *const kARDDefaultSTUNServerUrl =
-    @"stun:stun.l.google.com:19302";
-// TODO(tkchin): figure out a better username for CEOD statistics.
-static NSString *const kARDTurnRequestUrl =
-    @"https://computeengineondemand.appspot.com"
-    @"/turn?username=iapprtc&key=4080218913";
+static NSString * const kARDIceServerRequestUrl = @"https://appr.tc/params";
 
 static NSString *const kARDAppClientErrorDomain = @"ARDAppClient";
 static NSInteger const kARDAppClientErrorUnknown = -1;
@@ -67,7 +64,65 @@ static NSInteger const kARDAppClientErrorSetSDP = -4;
 static NSInteger const kARDAppClientErrorInvalidClient = -5;
 static NSInteger const kARDAppClientErrorInvalidRoom = -6;
 
-@implementation ARDAppClient
+static NSString * const kARDMediaStreamId = @"ARDAMS";
+static NSString * const kARDAudioTrackId = @"ARDAMSa0";
+static NSString * const kARDVideoTrackId = @"ARDAMSv0";
+static NSString * const kARDVideoTrackKind = @"video";
+
+// TODO(tkchin): Add these as UI options.
+static BOOL const kARDAppClientEnableTracing = NO;
+static BOOL const kARDAppClientEnableRtcEventLog = YES;
+static int64_t const kARDAppClientAecDumpMaxSizeInBytes = 5e6;  // 5 MB.
+static int64_t const kARDAppClientRtcEventLogMaxSizeInBytes = 5e6;  // 5 MB.
+static int const kKbpsMultiplier = 1000;
+
+// We need a proxy to NSTimer because it causes a strong retain cycle. When
+// using the proxy, |invalidate| must be called before it properly deallocs.
+@interface ARDTimerProxy : NSObject
+
+- (instancetype)initWithInterval:(NSTimeInterval)interval
+                         repeats:(BOOL)repeats
+                    timerHandler:(void (^)(void))timerHandler;
+- (void)invalidate;
+
+@end
+
+@implementation ARDTimerProxy {
+    NSTimer *_timer;
+    void (^_timerHandler)(void);
+}
+
+- (instancetype)initWithInterval:(NSTimeInterval)interval
+                         repeats:(BOOL)repeats
+                    timerHandler:(void (^)(void))timerHandler {
+    NSParameterAssert(timerHandler);
+    if (self = [super init]) {
+        _timerHandler = timerHandler;
+        _timer = [NSTimer scheduledTimerWithTimeInterval:interval
+                                                  target:self
+                                                selector:@selector(timerDidFire:)
+                                                userInfo:nil
+                                                 repeats:repeats];
+    }
+    return self;
+}
+
+- (void)invalidate {
+    [_timer invalidate];
+}
+
+- (void)timerDidFire:(NSTimer *)timer {
+    _timerHandler();
+}
+
+@end
+
+@implementation ARDAppClient {
+    RTCFileLogger *_fileLogger;
+    ARDTimerProxy *_statsTimer;
+    RTCMediaConstraints *_cameraConstraints;
+    NSNumber *_maxBitrate;
+}
 
 @synthesize delegate = _delegate;
 @synthesize state = _state;
@@ -96,15 +151,7 @@ static NSInteger const kARDAppClientErrorInvalidRoom = -6;
 @synthesize localMediaStream = _localMediaStream;
 
 - (instancetype)init {
-
-  if (self = [super init]) {
-    [[AppLogger sharedInstance] logClass:NSStringFromClass([self class])
-                                  message:[NSString stringWithFormat:@"init"]];
-    NSURL *turnRequestURL = [NSURL URLWithString:kARDTurnRequestUrl];
-    _turnClient = [[ARDCEODTURNClient alloc] initWithURL:turnRequestURL];
-    [self configure];
-  }
-  return self;
+    return [self initWithDelegate:nil];
 }
 
 - (instancetype)initWithDelegate:(id<ARDAppClientDelegate>)delegate {
@@ -113,8 +160,9 @@ static NSInteger const kARDAppClientErrorInvalidRoom = -6;
         logClass:NSStringFromClass([self class])
          message:[NSString stringWithFormat:@"initWithDelegate"]];
     _delegate = delegate;
-    NSURL *turnRequestURL = [NSURL URLWithString:kARDTurnRequestUrl];
-    _turnClient = [[ARDCEODTURNClient alloc] initWithURL:turnRequestURL];
+      NSURL *turnRequestURL = [NSURL URLWithString:kARDIceServerRequestUrl];
+      _turnClient = [[ARDTURNClient alloc] initWithURL:turnRequestURL];
+
     [self configure];
   }
   return self;
@@ -150,7 +198,7 @@ static NSInteger const kARDAppClientErrorInvalidRoom = -6;
        message:[NSString stringWithFormat:@"configure"]];
   _factory = [[RTCPeerConnectionFactory alloc] init];
   _messageQueue = [NSMutableArray array];
-  _iceServers = [NSMutableArray arrayWithObject:[self defaultSTUNServer]];
+  _iceServers = [NSMutableArray array];
   _shelterState = kShelterStateDisconnected;
   _roomId = [[NSUserDefaults standardUserDefaults] stringForKey:@"shelter_id"];
   _clientId = [[Utils deviceUID] stringByAppendingString:@"_ios"];
@@ -160,6 +208,21 @@ static NSInteger const kARDAppClientErrorInvalidRoom = -6;
   _websocketRestURL = _websocketURL;
   _isICEConnectionClosed = YES;
   _isMicrophoneAvailable = YES;
+    
+    _factory = [[RTCPeerConnectionFactory alloc] init];
+    _messageQueue = [NSMutableArray array];
+    _iceServers = [NSMutableArray array];
+    _fileLogger = [[RTCFileLogger alloc] init];
+    [_fileLogger start];
+    
+    ARDSettingsModel *settingsModel = [[ARDSettingsModel alloc] init];
+    RTCMediaConstraints *cameraConstraints = [[RTCMediaConstraints alloc]
+                                              initWithMandatoryConstraints:nil
+                                              optionalConstraints:[settingsModel
+                                                                   currentMediaConstraintFromStoreAsRTCDictionary]];
+    [self setMaxBitrate:[settingsModel currentMaxBitrateSettingFromStore]];
+    [self setCameraConstraints:cameraConstraints];
+
 
   [[NSNotificationCenter defaultCenter]
       addObserver:self
@@ -197,34 +260,41 @@ static NSInteger const kARDAppClientErrorInvalidRoom = -6;
   [_delegate appClient:self didChangeState:_state];
 }
 
-- (void)connectToShelter {
-  [[AppLogger sharedInstance]
-      logClass:NSStringFromClass([self class])
-       message:[NSString stringWithFormat:@"connectToShelter"]];
-  self.state = kARDAppClientStateConnecting;
-
-  __weak ARDAppClient *weakSelf = self;
-  [_turnClient requestServersWithCompletionHandler:^(NSArray *turnServers,
-                                                     NSError *error) {
-    if (error) {
-      [[AppLogger sharedInstance]
-          logClass:NSStringFromClass([self class])
-           message:[NSString
-                       stringWithFormat:@"Error retrieving TURN servers: %@",
-                                        error]];
+- (void) connectToShelter {
+    _isLoopback = NO;
+    _isAudioOnly = NO;
+    _shouldMakeAecDump = NO;
+    _shouldUseLevelControl = NO;
+    
+#if defined(WEBRTC_IOS)
+    if (kARDAppClientEnableTracing) {
+        NSString *filePath = [self documentsFilePathForFileName:@"webrtc-trace.txt"];
+        RTCStartInternalCapture(filePath);
     }
-    ARDAppClient *strongSelf = weakSelf;
-    [strongSelf.iceServers addObjectsFromArray:turnServers];
-    strongSelf.isTurnComplete = YES;
-
-    if ([self canCreatePeerConnection]) {
-      [strongSelf startSignalingIfReady];
-    }
-  }];
-
-  // [self prepareParameters];
-  [self registerWithColliderIfReady];
+#endif
+    
+    // Request TURN.
+    __weak ARDAppClient *weakSelf = self;
+    [_turnClient requestServersWithCompletionHandler:^(NSArray *turnServers,
+                                                       NSError *error) {
+        if (error) {
+            [[AppLogger sharedInstance]
+             logClass:NSStringFromClass([self class])
+             message:[NSString stringWithFormat:@"Error retrieving TURN servers: %@",
+                      error.localizedDescription]];
+        }
+        ARDAppClient *strongSelf = weakSelf;
+        [strongSelf.iceServers addObjectsFromArray:turnServers];
+        strongSelf.isTurnComplete = YES;
+        if ([self canCreatePeerConnection]) {
+            [strongSelf startSignalingIfReady];
+        }
+    }];
+    
+    [self registerWithColliderIfReady];
+    
 }
+
 
 - (void)disconnect {
   [[AppLogger sharedInstance]
@@ -239,6 +309,14 @@ static NSInteger const kARDAppClientErrorInvalidRoom = -6;
   _channel = nil;
 
   self.state = kARDAppClientStateDisconnected;
+}
+
+- (void)setCameraConstraints:(RTCMediaConstraints *)mediaConstraints {
+    _cameraConstraints = mediaConstraints;
+}
+
+- (void)setMaxBitrate:(NSNumber *)maxBitrate {
+    _maxBitrate = maxBitrate;
 }
 
 #pragma mark - ARDSignalingChannelDelegate
@@ -282,6 +360,8 @@ static NSInteger const kARDAppClientErrorInvalidRoom = -6;
 
     [self processSignalingMessage:message];
     return;
+      default:
+          return;
   }
   [self drainMessageQueueIfReady];
 }
@@ -348,127 +428,144 @@ static NSInteger const kARDAppClientErrorInvalidRoom = -6;
   }
 }
 
+
 #pragma mark - RTCPeerConnectionDelegate
 // Callbacks for this delegate occur on non-main thread and need to be
 // dispatched back to main queue as needed.
 
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
- signalingStateChanged:(RTCSignalingState)stateChanged {
-  [[AppLogger sharedInstance]
-      logClass:NSStringFromClass([self class])
-       message:[NSString stringWithFormat:@"Signaling state changed: %i",
-                                          stateChanged]];
-
-  switch (stateChanged) {
-  case RTCSignalingStable:
-  case RTCSignalingHaveLocalOffer:
-  case RTCSignalingHaveRemoteOffer:
-  case RTCSignalingHaveLocalPrAnswer:
-  case RTCSignalingHaveRemotePrAnswer:
-    break;
-  case RTCSignalingClosed: {
-    _isPeerConnectionCreating = NO;
-    _isPeerConnectionPendingToClose = NO;
-    _hasReceivedSdp = NO;
-    break;
-  }
-  }
-}
-
-- (void)peerConnection:(RTCPeerConnection *)peerConnection
-           addedStream:(RTCMediaStream *)stream {
-  [[AppLogger sharedInstance]
-      logClass:NSStringFromClass([self class])
-       message:[NSString stringWithFormat:
-                             @"Received %lu video tracks and %lu audio tracks",
-                             (unsigned long)stream.videoTracks.count,
-                             (unsigned long)stream.audioTracks.count]];
-  dispatch_async(dispatch_get_main_queue(), ^{
-
-    if (stream.audioTracks.count) {
-      _remoteAudioTrack = stream.audioTracks[0];
-    }
-    if (stream.videoTracks.count) {
-      RTCVideoTrack *videoTrack = stream.videoTracks[0];
-      [_delegate appClient:self didReceiveRemoteVideoTrack:videoTrack];
-    }
-  });
-}
-
-- (void)peerConnection:(RTCPeerConnection *)peerConnection
-         removedStream:(RTCMediaStream *)stream {
-  [[AppLogger sharedInstance]
-      logClass:NSStringFromClass([self class])
-       message:[NSString stringWithFormat:@"Stream was removed"]];
-}
-
-- (void)peerConnectionOnRenegotiationNeeded:
-    (RTCPeerConnection *)peerConnection {
-  [[AppLogger sharedInstance]
-      logClass:NSStringFromClass([self class])
-       message:[NSString
-                   stringWithFormat:
-                       @"WARNING: Renegatiation needed but unimplemented."]];
-}
-
-- (void)peerConnection:(RTCPeerConnection *)peerConnection
-  iceConnectionChanged:(RTCICEConnectionState)newState {
-  [[AppLogger sharedInstance]
-      logClass:NSStringFromClass([self class])
-       message:[NSString stringWithFormat:@"ICE state changed: %i", newState]];
-
-  switch (newState) {
-  case RTCICEConnectionNew:
-    _isICEConnectionClosed = NO;
-    break;
-  case RTCICEConnectionChecking:
-    break;
-  case RTCICEConnectionConnected:
-    _isPeerConnectionCreating = NO;
-    _hasP2PSuccessfulyConnected = YES;
-    break;
-  case RTCICEConnectionCompleted:
-    break;
-  case RTCICEConnectionDisconnected:
-  case RTCICEConnectionFailed:
-    _isICEConnected = NO;
-    [_delegate appClient:self didChangeShelterState:kShelterStateOffline];
-    break;
-  case RTCICEConnectionClosed: {
-    _isICEConnected = NO;
-    _isICEConnectionClosed = YES;
-    break;
-  }
-  }
-
-  [_delegate appClient:self didChangeConnectionState:newState];
-}
-
-- (void)peerConnection:(RTCPeerConnection *)peerConnection
-   iceGatheringChanged:(RTCICEGatheringState)newState {
-  if (peerConnection != _peerConnection)
+didChangeSignalingState:(RTCSignalingState)stateChanged {
+//    RTCLog(@"Signaling state changed: %ld", (long)stateChanged);
+    
     [[AppLogger sharedInstance]
-        logClass:NSStringFromClass([self class])
-         message:[NSString stringWithFormat:@"ICE gathering state changed: %d",
-                                            newState]];
+     logClass:NSStringFromClass([self class])
+     message:[NSString stringWithFormat:@"Signaling state changed: %li",
+              (long)stateChanged]];
+    
+    switch (stateChanged) {
+        case RTCSignalingStateStable:
+        case RTCSignalingStateHaveLocalOffer:
+        case RTCSignalingStateHaveRemoteOffer:
+        case RTCSignalingStateHaveLocalPrAnswer:
+        case RTCSignalingStateHaveRemotePrAnswer:
+            break;
+        case RTCSignalingStateClosed: {
+            _isPeerConnectionCreating = NO;
+            _isPeerConnectionPendingToClose = NO;
+            _hasReceivedSdp = NO;
+            break;
+        }
+    }
 }
 
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
-       gotICECandidate:(RTCICECandidate *)candidate {
-  dispatch_async(dispatch_get_main_queue(), ^{
-    ARDICECandidateMessage *message =
-        [[ARDICECandidateMessage alloc] initWithCandidate:candidate
-                                                   andSrc:_clientId
-                                           andDestination:_roomId];
-    [self sendSignalingMessage:message];
-  });
+          didAddStream:(RTCMediaStream *)stream {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[AppLogger sharedInstance]
+         logClass:NSStringFromClass([self class])
+         message:[NSString stringWithFormat:@"Received %lu video tracks and %lu audio tracks",
+                  (unsigned long)stream.videoTracks.count,
+                  (unsigned long)stream.audioTracks.count]];
+        
+        if (stream.videoTracks.count) {
+            RTCVideoTrack *videoTrack = stream.videoTracks[0];
+            [_delegate appClient:self didReceiveRemoteVideoTrack:videoTrack];
+        }
+    });
 }
 
-//- (void)peerConnection:(RTCPeerConnection *)peerConnection
-//    didOpenDataChannel:(RTCDataChannel *)dataChannel {
-//  if (peerConnection != _peerConnection)
-//    NSLog(@"PeerConnection didOpenDataChannel");
-//}
+- (void)peerConnection:(RTCPeerConnection *)peerConnection
+       didRemoveStream:(RTCMediaStream *)stream {
+//    RTCLog(@"Stream was removed.");
+    [[AppLogger sharedInstance]
+     logClass:NSStringFromClass([self class])
+     message:[NSString stringWithFormat:@"Stream was removed."]];
+}
+
+- (void)peerConnectionShouldNegotiate:(RTCPeerConnection *)peerConnection {
+//    RTCLog(@"WARNING: Renegotiation needed but unimplemented.");
+    [[AppLogger sharedInstance]
+     logClass:NSStringFromClass([self class])
+     message:[NSString stringWithFormat:@"WARNING: Renegotiation needed but unimplemented."]];
+}
+
+- (void)peerConnection:(RTCPeerConnection *)peerConnection
+didChangeIceConnectionState:(RTCIceConnectionState)newState {
+//    RTCLog(@"ICE state changed: %ld", (long)newState);
+    [[AppLogger sharedInstance]
+     logClass:NSStringFromClass([self class])
+     message:[NSString stringWithFormat:@"ICE state changed: %ld", (long)newState]];
+
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        
+        [[AppLogger sharedInstance]
+         logClass:NSStringFromClass([self class])
+         message:[NSString stringWithFormat:@"ICE state changed: %li", (long)newState]];
+        
+        switch (newState) {
+            case RTCIceConnectionStateNew:
+                _isICEConnectionClosed = NO;
+                break;
+            case RTCIceConnectionStateChecking:
+                break;
+            case RTCIceConnectionStateConnected:
+                _isPeerConnectionCreating = NO;
+                _hasP2PSuccessfulyConnected = YES;
+                break;
+            case RTCIceConnectionStateCompleted:
+                break;
+            case RTCIceConnectionStateDisconnected:
+            case RTCIceConnectionStateFailed:
+                _isICEConnected = NO;
+                [_delegate appClient:self didChangeShelterState:kShelterStateOffline];
+                break;
+            case RTCIceConnectionStateClosed: {
+                _isICEConnected = NO;
+                _isICEConnectionClosed = YES;
+                break;
+            }
+            default:
+                break;
+        }
+        
+        [_delegate appClient:self didChangeConnectionState:newState];
+        
+        
+//        [_delegate appClient:self didChangeConnectionState:newState];
+    });
+}
+
+- (void)peerConnection:(RTCPeerConnection *)peerConnection
+didChangeIceGatheringState:(RTCIceGatheringState)newState {
+//    RTCLog(@"ICE gathering state changed: %ld", (long)newState);
+    [[AppLogger sharedInstance]
+     logClass:NSStringFromClass([self class])
+     message:[NSString stringWithFormat:@"ICE gathering state changed: %ld", (long)newState]];
+}
+
+- (void)peerConnection:(RTCPeerConnection *)peerConnection
+didGenerateIceCandidate:(RTCIceCandidate *)candidate {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        ARDICECandidateMessage *message =
+        [[ARDICECandidateMessage alloc] initWithCandidate:candidate andSrc:_clientId andDestination:_roomId];
+        [self sendSignalingMessage:message];
+    });
+}
+
+- (void)peerConnection:(RTCPeerConnection *)peerConnection
+didRemoveIceCandidates:(NSArray<RTCIceCandidate *> *)candidates {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        ARDICECandidateRemovalMessage *message =
+        [[ARDICECandidateRemovalMessage alloc]
+         initWithRemovedCandidates:candidates];
+        [self sendSignalingMessage:message];
+    });
+}
+
+- (void)peerConnection:(RTCPeerConnection *)peerConnection
+    didOpenDataChannel:(RTCDataChannel *)dataChannel {
+}
 
 #pragma mark - RTCSessionDescriptionDelegate
 // Callbacks for this delegate occur on non-main thread and need to be
@@ -496,18 +593,20 @@ static NSInteger const kARDAppClientErrorInvalidRoom = -6;
       [_delegate appClient:self didError:sdpError];
       return;
     }
-    // Prefer H264 if available.
-    RTCSessionDescription *sdpPreferringH264 =
-        [ARDSDPUtils descriptionForDescription:sdp preferredVideoCodec:@"H264"];
-    [peerConnection setLocalDescriptionWithDelegate:self
-                                 sessionDescription:sdpPreferringH264];
-    ARDSessionDescriptionMessage *message =
-        [[ARDSessionDescriptionMessage alloc]
-            initWithDescription:sdpPreferringH264
-                         andSrc:_clientId
-                 andDestination:_roomId];
-
-    [self sendSignalingMessage:message];
+      // Prefer H264 if available.
+      RTCSessionDescription *sdpPreferringH264 =
+      [ARDSDPUtils descriptionForDescription:sdp
+                         preferredVideoCodec:@"H264"];
+      __weak ARDAppClient *weakSelf = self;
+      [_peerConnection setLocalDescription:sdpPreferringH264
+                         completionHandler:^(NSError *error) {
+                             ARDAppClient *strongSelf = weakSelf;
+                             [strongSelf peerConnection:strongSelf.peerConnection
+                      didSetSessionDescriptionWithError:error];
+                         }];
+      ARDSessionDescriptionMessage *message = [[ARDSessionDescriptionMessage alloc] initWithDescription:sdpPreferringH264 andSrc:_clientId andDestination:_roomId];
+      [self sendSignalingMessage:message];
+      [self setMaxBitrateForPeerConnectionVideoSender];
 
   });
 }
@@ -533,29 +632,24 @@ static NSInteger const kARDAppClientErrorInvalidRoom = -6;
       [_delegate appClient:self didError:sdpError];
       return;
     }
-    // If we're answering and we've just set the remote offer we need to create
-    // an answer and set the local description.
-    //    if (!peerConnection.localDescription)) {
-    //      RTCMediaConstraints *constraints = [self defaultAnswerConstraints];
-    //      [peerConnection createAnswerWithDelegate:self
-    //      constraints:constraints];
-    //    }
   });
 }
 
 #pragma mark - Private
 
-- (void)prepareParameters {
-  [[AppLogger sharedInstance]
-      logClass:NSStringFromClass([self class])
-       message:[NSString stringWithFormat:@"prepareParameters"]];
-  _roomId = [[NSUserDefaults standardUserDefaults] stringForKey:@"shelter_id"];
-  _clientId = [[Utils deviceUID] stringByAppendingString:@"_ios"];
+#if defined(WEBRTC_IOS)
 
-  _websocketURL = [NSURL URLWithString:[[NSUserDefaults standardUserDefaults]
-                                           stringForKey:@"ws_url"]];
-  _websocketRestURL = _websocketURL;
+- (NSString *)documentsFilePathForFileName:(NSString *)fileName {
+    NSParameterAssert(fileName.length);
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(
+                                                         NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirPath = paths.firstObject;
+    NSString *filePath =
+    [documentsDirPath stringByAppendingPathComponent:fileName];
+    return filePath;
 }
+
+#endif
 
 - (BOOL)hasJoinedRoomServerRoom {
   return _clientId.length;
@@ -567,55 +661,69 @@ static NSInteger const kARDAppClientErrorInvalidRoom = -6;
 // audio and video capture. If this client is the caller, an offer is created as
 // well, otherwise the client will wait for an offer to arrive.
 - (void)startSignalingIfReady {
-  [[AppLogger sharedInstance]
-      logClass:NSStringFromClass([self class])
-       message:[NSString stringWithFormat:@"startSignalingIfReady"]];
-  if (!_isTurnComplete) {
-    return;
-  }
-
-  if (!_isPeerConnectionCreating) {
     [[AppLogger sharedInstance]
-        logClass:NSStringFromClass([self class])
-         message:[NSString stringWithFormat:@"Creating PeerConnection"]];
-    _isPeerConnectionCreating = YES;
-    self.state = kARDAppClientStateConnected;
-
-    // Create peer connection.
-    //       if (!_peerConnection) {
-    RTCMediaConstraints *constraints = [self defaultPeerConnectionConstraints];
-    RTCConfiguration *config = [[RTCConfiguration alloc] init];
-    config.iceServers = _iceServers;
-    [[AppLogger sharedInstance]
-        logClass:NSStringFromClass([self class])
-         message:[NSString stringWithFormat:@"Before _peerConnection"]];
-    _peerConnection = [_factory peerConnectionWithConfiguration:config
-                                                    constraints:constraints
-                                                       delegate:self];
-    NSLog(@"peerConnection:");
-    NSLog(@"%@", _peerConnection.localStreams);
-    [[AppLogger sharedInstance]
-        logClass:NSStringFromClass([self class])
-         message:[NSString stringWithFormat:@"After _peerConnection"]];
-    // Create AV media stream and add it to the peer connection.
-    if (!_localMediaStream) {
-      _localMediaStream = [self createLocalMediaStream];
+     logClass:NSStringFromClass([self class])
+     message:[NSString stringWithFormat:@"startSignalingIfReady"]];
+    if (!_isTurnComplete) {
+        return;
     }
-
-    [_peerConnection addStream:_localMediaStream];
-    //    }
-    // Send offer.
-    [[AppLogger sharedInstance]
-        logClass:NSStringFromClass([self class])
+    
+    if (!_isPeerConnectionCreating) {
+        [[AppLogger sharedInstance]
+         logClass:NSStringFromClass([self class])
+         message:[NSString stringWithFormat:@"Creating PeerConnection"]];
+        _isPeerConnectionCreating = YES;
+        self.state = kARDAppClientStateConnected;
+        
+        RTCMediaConstraints *constraints = [self defaultOfferConstraints];
+        RTCConfiguration *config = [[RTCConfiguration alloc] init];
+        config.iceServers = _iceServers;
+        _peerConnection = [_factory peerConnectionWithConfiguration:config
+                                                        constraints:constraints
+                                                           delegate:self];
+        // Create AV senders.
+        [self createVideoSender];
+        [self createAudioSender];
+        
+        [[AppLogger sharedInstance]
+         logClass:NSStringFromClass([self class])
          message:[NSString stringWithFormat:@"Sending offer"]];
-    [_peerConnection createOfferWithDelegate:self
-                                 constraints:[self defaultOfferConstraints]];
-  } else {
-    [[AppLogger sharedInstance]
-        logClass:NSStringFromClass([self class])
+        // Send offer.
+        __weak ARDAppClient *weakSelf = self;
+        [_peerConnection offerForConstraints:[self defaultOfferConstraints]
+                           completionHandler:^(RTCSessionDescription *sdp,
+                                               NSError *error) {
+                               ARDAppClient *strongSelf = weakSelf;
+                               [strongSelf peerConnection:strongSelf.peerConnection
+                              didCreateSessionDescription:sdp
+                                                    error:error];
+                           }];
+    } else {
+        [[AppLogger sharedInstance]
+         logClass:NSStringFromClass([self class])
          message:[NSString
-                     stringWithFormat:@"PeerConnection is already creating"]];
-  }
+                  stringWithFormat:@"PeerConnection is already creating"]];
+    }
+    
+#if defined(WEBRTC_IOS)
+    // Start event log.
+    if (kARDAppClientEnableRtcEventLog) {
+        NSString *filePath = [self documentsFilePathForFileName:@"webrtc-rtceventlog"];
+        if (![_peerConnection startRtcEventLogWithFilePath:filePath
+                                            maxSizeInBytes:kARDAppClientRtcEventLogMaxSizeInBytes]) {
+            RTCLogError(@"Failed to start event logging.");
+        }
+    }
+    
+    // Start aecdump diagnostic recording.
+    if (_shouldMakeAecDump) {
+        NSString *filePath = [self documentsFilePathForFileName:@"webrtc-audio.aecdump"];
+        if (![_factory startAecDumpWithFilePath:filePath
+                                 maxSizeInBytes:kARDAppClientAecDumpMaxSizeInBytes]) {
+            RTCLogError(@"Failed to start aec dump.");
+        }
+    }
+#endif
 }
 
 // Processes the messages that we've received from the room server and the
@@ -643,6 +751,7 @@ static NSInteger const kARDAppClientErrorInvalidRoom = -6;
        message:[NSString stringWithFormat:@"processSignallingMessage type: %d",
                                           message.type]];
   NSParameterAssert(_peerConnection ||
+                    message.type == kARDSignalingMessageTypePing ||
                     message.type == kARDSignalingMessageTypeBye ||
                     message.type == kARDSignalingMessageTypeShelterStatus ||
                     message.type == kARDSignalingMessageTypeAlarmReset ||
@@ -653,168 +762,180 @@ static NSInteger const kARDAppClientErrorInvalidRoom = -6;
                     message.type == kARDSignalingMessageTypeListening ||
                     message.type == kARDSignalingMessageTypeCallState);
 
-  switch (message.type) {
-  case kARDSignalingMessageTypeOffer:
-  case kARDSignalingMessageTypeAnswer: {
-    ARDSessionDescriptionMessage *sdpMessage =
-        (ARDSessionDescriptionMessage *)message;
-    RTCSessionDescription *description = sdpMessage.sessionDescription;
-    // Prefer H264 if available.
-    RTCSessionDescription *sdpPreferringH264 =
-        [ARDSDPUtils descriptionForDescription:description
-                           preferredVideoCodec:@"H264"];
-
-    [_peerConnection setRemoteDescriptionWithDelegate:self
-                                   sessionDescription:sdpPreferringH264];
-
-    break;
-  }
-  case kARDSignalingMessageTypeCandidate: {
-    ARDICECandidateMessage *candidateMessage =
-        (ARDICECandidateMessage *)message;
-    [_peerConnection addICECandidate:candidateMessage.candidate];
-
-    break;
-  }
-  case kARDSignalingMessageTypePing:{
-        [self sendSignalingMessage:[[ARDPongMessage alloc] init]];
-    break;
-      }
-  case kARDSignalingMessageTypeBye:
-  case kARDSignalingMessageTypeAlarmReset:
-    // Other client disconnected.
-    // TODO(tkchin): support waiting in room for next client. For now just
-    // disconnect.
-    _isDisconnecting = YES;
-    [_delegate appClientDidReceivedAlarmReset:self];
-    break;
-  case kARDSignalingMessageTypeShelterStatus: {
-
-    ARDShelterStatusMessage *shelterStatusMessage =
-        (ARDShelterStatusMessage *)message;
-    [[AppLogger sharedInstance]
-        logClass:NSStringFromClass([self class])
-         message:[NSString stringWithFormat:
-                               @"ARDSignalingMessageTypeShelterStatus: %d",
-                               shelterStatusMessage.shelterStatus]];
-    // Check if state changed
-    if (_shelterState != shelterStatusMessage.shelterStatus) {
-      [[AppLogger sharedInstance]
-          logClass:NSStringFromClass([self class])
-           message:[NSString stringWithFormat:@"shelterState changed"]];
-      _shelterState = (ShelterState)shelterStatusMessage.shelterStatus;
-      // If Shelter went online
-      if (_shelterState == kShelterStateOnline) {
-        // TODO: Check if this is needed. Change call state
-        _callState = kShelterCallStateNone;
-
-        // If there is no active PeerConnection we should connect
-        [self startPeerConnectionIfReady];
-      } else { // If Shelter went offline
-
-        // Send system message that call was lost
-        if (_callState == kShelterCallStateAnswered ||
-            _callState == kShelterCallStateOnHold) {
-          [_delegate appClient:self
-              sendSystemMessage:NSLocalizedString(@"audio_connection_lost",
-                                                  nil)];
+    switch (message.type) {
+        case kARDSignalingMessageTypeOffer:
+        case kARDSignalingMessageTypeAnswer: {
+            ARDSessionDescriptionMessage *sdpMessage =
+            (ARDSessionDescriptionMessage *)message;
+            RTCSessionDescription *description = sdpMessage.sessionDescription;
+            // Prefer H264 if available.
+            RTCSessionDescription *sdpPreferringH264 =
+            [ARDSDPUtils descriptionForDescription:description
+                               preferredVideoCodec:@"H264"];
+            __weak ARDAppClient *weakSelf = self;
+            [_peerConnection setRemoteDescription:sdpPreferringH264
+                                completionHandler:^(NSError *error) {
+                                    ARDAppClient *strongSelf = weakSelf;
+                                    [strongSelf peerConnection:strongSelf.peerConnection
+                             didSetSessionDescriptionWithError:error];
+                                }];
+            break;
         }
-        // TODO: Check if this is needed. Change call state
-        _callState = kShelterCallStateNone;
-
-        // Set Shelter state
-        //        _isShelterComplete = NO;
-
-        // Destroy all connection objects
-        [self destroyPeerConnection];
-      }
-      // TODO: Check this. Send delegate method for UI???
-      [_delegate appClient:self didChangeShelterState:_shelterState];
+        case kARDSignalingMessageTypeCandidate: {
+            ARDICECandidateMessage *candidateMessage =
+            (ARDICECandidateMessage *)message;
+            [_peerConnection addIceCandidate:candidateMessage.candidate];
+            
+            break;
+        }
+        case kARDSignalingMessageTypeCandidateRemoval: {
+            ARDICECandidateRemovalMessage *candidateMessage =
+            (ARDICECandidateRemovalMessage *)message;
+            [_peerConnection removeIceCandidates:candidateMessage.candidates];
+            break;
+        }
+            
+        case kARDSignalingMessageTypePing:{
+            [self sendSignalingMessage:[[ARDPongMessage alloc] init]];
+            break;
+        }
+        case kARDSignalingMessageTypeBye:
+        case kARDSignalingMessageTypeAlarmReset:
+            // Other client disconnected.
+            // TODO(tkchin): support waiting in room for next client. For now just
+            // disconnect.
+            _isDisconnecting = YES;
+            [_delegate appClientDidReceivedAlarmReset:self];
+            break;
+        case kARDSignalingMessageTypeShelterStatus: {
+            
+            ARDShelterStatusMessage *shelterStatusMessage =
+            (ARDShelterStatusMessage *)message;
+            [[AppLogger sharedInstance]
+             logClass:NSStringFromClass([self class])
+             message:[NSString stringWithFormat:
+                      @"ARDSignalingMessageTypeShelterStatus: %d",
+                      shelterStatusMessage.shelterStatus]];
+            // Check if state changed
+            if (_shelterState != shelterStatusMessage.shelterStatus) {
+                [[AppLogger sharedInstance]
+                 logClass:NSStringFromClass([self class])
+                 message:[NSString stringWithFormat:@"shelterState changed"]];
+                _shelterState = (ShelterState)shelterStatusMessage.shelterStatus;
+                // If Shelter went online
+                if (_shelterState == kShelterStateOnline) {
+                    // TODO: Check if this is needed. Change call state
+                    _callState = kShelterCallStateNone;
+                    
+                    // If there is no active PeerConnection we should connect
+                    [self startPeerConnectionIfReady];
+                } else { // If Shelter went offline
+                    
+                    // Send system message that call was lost
+                    if (_callState == kShelterCallStateAnswered ||
+                        _callState == kShelterCallStateOnHold) {
+                        [_delegate appClient:self
+                           sendSystemMessage:NSLocalizedString(@"audio_connection_lost",
+                                                               nil)];
+                    }
+                    // TODO: Check if this is needed. Change call state
+                    _callState = kShelterCallStateNone;
+                    
+                    // Set Shelter state
+                    //        _isShelterComplete = NO;
+                    
+                    // Destroy all connection objects
+                    [self destroyPeerConnection];
+                }
+                // TODO: Check this. Send delegate method for UI???
+                [_delegate appClient:self didChangeShelterState:_shelterState];
+            }
+            break;
+        }
+        case kARDSignalingMessageTypeRequestCall:
+        case kARDSignalingMessageTypeBatteryLevel:
+            // NOTHING TODO SHOULDN'T GET THIS
+            break;
+        case kARDSignalingMessageTypeMessage: {
+            ARDChatMessage *chatMessage = (ARDChatMessage *)message;
+            [_delegate appClient:self didReceivedMessage:chatMessage.message];
+            break;
+        }
+        case kARDSignalingMessageTypeListening: {
+            ARDListeningMessage *listeningMessage = (ARDListeningMessage *)message;
+            [_delegate appClient:self
+ didReceivedListeningStateChange:listeningMessage.listeningStatus];
+            break;
+        }
+        case kARDSignalingMessageTypeVideo: {
+            ARDVideoMessage *videoMessage = (ARDVideoMessage *)message;
+            if (_videoState != videoMessage.videoStatus) {
+                _videoState = videoMessage.videoStatus;
+                [self changeVideoStreaming];
+                if (_videoState && _queuedBatteryLevel > 0) {
+                    [self sendBatteryLevel:_queuedBatteryLevel];
+                }
+            }
+            break;
+        }
+        case kARDSignalingMessageTypeCallState: {
+            ARDCallStateMessage *callStateMessage = (ARDCallStateMessage *)message;
+            if (callStateMessage.callState &&
+                (_callState != kShelterCallStateAnswered &&
+                 _callState != kShelterCallStateOnHold)) {
+                    _callState = kShelterCallStateAnswered;
+                    [_delegate appClientDidResumeCallState:self];
+                    [_delegate appClient:self
+                       sendSystemMessage:NSLocalizedString(@"audio_connection_recreated",
+                                                           nil)];
+                }
+            break;
+        }
+        case kARDSignalingMessageTypeMessages: {
+            ARDQueuedChatMessages *chatMessages = (ARDQueuedChatMessages *)message;
+            for (Message *chatMessage in chatMessages.messages) {
+                [_delegate appClient:self didReceivedMessage:chatMessage];
+            }
+            Message *systemMessage = [[Message alloc]
+                                      initWithType:2
+                                      andText:[NSString stringWithFormat:
+                                               @"Added %lu %@, scroll up to see %@",
+                                               (unsigned long)[chatMessages.messages count],
+                                               [chatMessages.messages count] == 1
+                                               ? @"message"
+                                                                        : @"messages",
+                                               [chatMessages.messages count] == 1 ? @"it"
+                                                                        : @"them"]
+                                      andTimestamp:-1];
+            [_delegate appClient:self didReceivedMessage:systemMessage];
+            break;
+        }
+        case kARDSignalingMessageTypePeerConnection: {
+            ARDPeerConnectionMessage *connectionMessage =
+            (ARDPeerConnectionMessage *)message;
+            
+            // Check if state changed
+            if (_peerConnectionState != connectionMessage.connectionState) {
+                
+                // Update current state
+                _peerConnectionState = connectionMessage.connectionState;
+                
+                if (_peerConnectionState) {
+                    // If all requirements are good start peer connection
+                    [self startPeerConnectionIfReady];
+                } else {
+                    // Destroy all connection objects
+                    [self destroyPeerConnection];
+                    // Recreate PeerConnectionFactory
+                    //[self recreatePeerConnectionFactory];
+                    NSLog(@"Unable to create peer connection at this moment");
+                }
+            }
+            break;
+        }
+        default:
+            break;
     }
-    break;
-  }
-  case kARDSignalingMessageTypeRequestCall:
-  case kARDSignalingMessageTypeBatteryLevel:
-    // NOTHING TODO SHOULDN'T GET THIS
-    break;
-  case kARDSignalingMessageTypeMessage: {
-    ARDChatMessage *chatMessage = (ARDChatMessage *)message;
-    [_delegate appClient:self didReceivedMessage:chatMessage.message];
-    break;
-  }
-  case kARDSignalingMessageTypeListening: {
-    ARDListeningMessage *listeningMessage = (ARDListeningMessage *)message;
-    [_delegate appClient:self
-        didReceivedListeningStateChange:listeningMessage.listeningStatus];
-    break;
-  }
-  case kARDSignalingMessageTypeVideo: {
-    ARDVideoMessage *videoMessage = (ARDVideoMessage *)message;
-    if (_videoState != videoMessage.videoStatus) {
-      _videoState = videoMessage.videoStatus;
-      [self changeVideoStreaming];
-      if (_videoState && _queuedBatteryLevel > 0) {
-        [self sendBatteryLevel:_queuedBatteryLevel];
-      }
-    }
-    break;
-  }
-  case kARDSignalingMessageTypeCallState: {
-    ARDCallStateMessage *callStateMessage = (ARDCallStateMessage *)message;
-    if (callStateMessage.callState &&
-        (_callState != kShelterCallStateAnswered &&
-         _callState != kShelterCallStateOnHold)) {
-      _callState = kShelterCallStateAnswered;
-      [_delegate appClientDidResumeCallState:self];
-      [_delegate appClient:self
-          sendSystemMessage:NSLocalizedString(@"audio_connection_recreated",
-                                              nil)];
-    }
-    break;
-  }
-  case kARDSignalingMessageTypeMessages: {
-    ARDQueuedChatMessages *chatMessages = (ARDQueuedChatMessages *)message;
-    for (Message *chatMessage in chatMessages.messages) {
-      [_delegate appClient:self didReceivedMessage:chatMessage];
-    }
-    Message *systemMessage = [[Message alloc]
-        initWithType:2
-             andText:[NSString stringWithFormat:
-                                   @"Added %lu %@, scroll up to see %@",
-                                   (unsigned long)[chatMessages.messages count],
-                                   [chatMessages.messages count] == 1
-                                       ? @"message"
-                                       : @"messages",
-                                   [chatMessages.messages count] == 1 ? @"it"
-                                                                      : @"them"]
-        andTimestamp:-1];
-    [_delegate appClient:self didReceivedMessage:systemMessage];
-    break;
-  }
-  case kARDSignalingMessageTypePeerConnection: {
-    ARDPeerConnectionMessage *connectionMessage =
-        (ARDPeerConnectionMessage *)message;
-
-    // Check if state changed
-    if (_peerConnectionState != connectionMessage.connectionState) {
-
-      // Update current state
-      _peerConnectionState = connectionMessage.connectionState;
-
-      if (_peerConnectionState) {
-        // If all requirements are good start peer connection
-        [self startPeerConnectionIfReady];
-      } else {
-        // Destroy all connection objects
-        [self destroyPeerConnection];
-        // Recreate PeerConnectionFactory
-        //[self recreatePeerConnectionFactory];
-        NSLog(@"Unable to create peer connection at this moment");
-      }
-    }
-    break;
-  }
-  }
 }
 
 // Sends a signaling message to the other client. The caller will send messages
@@ -834,55 +955,71 @@ static NSInteger const kARDAppClientErrorInvalidRoom = -6;
   }
 }
 
-- (RTCMediaStream *)createLocalMediaStream {
-  [[AppLogger sharedInstance]
-      logClass:NSStringFromClass([self class])
-       message:[NSString stringWithFormat:@"createLocalMediaStream"]];
-  RTCMediaStream *localStream = [_factory mediaStreamWithLabel:@"ARDAMS"];
-  RTCVideoTrack *localVideoTrack = [self createLocalVideoTrack];
+- (RTCRtpSender *)createVideoSender {
+    RTCRtpSender *sender =
+    [_peerConnection senderWithKind:kRTCMediaStreamTrackKindVideo
+                           streamId:kARDMediaStreamId];
+    RTCVideoTrack *track = [self createLocalVideoTrack];
+    if (track) {
+        sender.track = track;
+        [_delegate appClient:self didReceiveLocalVideoTrack:track];
+    }
+    
+    return sender;
+}
 
-  if (localVideoTrack) {
-    [localStream addVideoTrack:localVideoTrack];
-    //[_delegate appClient:self didReceiveLocalVideoTrack:localVideoTrack];
-  }
+- (void)setMaxBitrateForPeerConnectionVideoSender {
+    for (RTCRtpSender *sender in _peerConnection.senders) {
+        if (sender.track != nil) {
+            if ([sender.track.kind isEqualToString:kARDVideoTrackKind]) {
+                [self setMaxBitrate:_maxBitrate forVideoSender:sender];
+            }
+        }
+    }
+}
 
-  [localStream addAudioTrack:[_factory audioTrackWithID:@"ARDAMSa0"]];
+- (void)setMaxBitrate:(NSNumber *)maxBitrate forVideoSender:(RTCRtpSender *)sender {
+    if (maxBitrate.intValue <= 0) {
+        return;
+    }
+    
+    RTCRtpParameters *parametersToModify = sender.parameters;
+    for (RTCRtpEncodingParameters *encoding in parametersToModify.encodings) {
+        encoding.maxBitrateBps = @(maxBitrate.intValue * kKbpsMultiplier);
+    }
+    [sender setParameters:parametersToModify];
+}
 
-  return localStream;
+- (RTCRtpSender *)createAudioSender {
+    RTCMediaConstraints *constraints = [self defaultMediaAudioConstraints];
+    RTCAudioSource *source = [_factory audioSourceWithConstraints:constraints];
+    RTCAudioTrack *track = [_factory audioTrackWithSource:source
+                                                  trackId:kARDAudioTrackId];
+    RTCRtpSender *sender =
+    [_peerConnection senderWithKind:kRTCMediaStreamTrackKindAudio
+                           streamId:kARDMediaStreamId];
+    sender.track = track;
+    return sender;
 }
 
 - (RTCVideoTrack *)createLocalVideoTrack {
-  [[AppLogger sharedInstance]
-      logClass:NSStringFromClass([self class])
-       message:[NSString stringWithFormat:@"createLocalVideoTrack"]];
-  RTCVideoTrack *localVideoTrack = nil;
-// The iOS simulator doesn't provide any sort of camera capture
-// support or emulation (http://goo.gl/rHAnC1) so don't bother
-// trying to open a local stream.
-// TODO(tkchin): local video capture for OSX. See
-// https://code.google.com/p/webrtc/issues/detail?id=3417.
-#if !TARGET_IPHONE_SIMULATOR && TARGET_OS_IPHONE
-  RTCMediaConstraints *mediaConstraints = [self defaultMediaStreamConstraints];
-  RTCAVFoundationVideoSource *source =
-      [[RTCAVFoundationVideoSource alloc] initWithFactory:_factory
-                                              constraints:mediaConstraints];
-
-  localVideoTrack = [[RTCVideoTrack alloc] initWithFactory:_factory
-                                                    source:source
-                                                   trackId:@"ARDAMSv0"];
+    RTCVideoTrack* localVideoTrack = nil;
+    // The iOS simulator doesn't provide any sort of camera capture
+    // support or emulation (http://goo.gl/rHAnC1) so don't bother
+    // trying to open a local stream.
+#if !TARGET_IPHONE_SIMULATOR
+//    if (!_isAudioOnly) {
+        RTCMediaConstraints *cameraConstraints =
+        [self cameraConstraints];
+        RTCAVFoundationVideoSource *source =
+        [_factory avFoundationVideoSourceWithConstraints:cameraConstraints];
+        source.useBackCamera = YES;
+        localVideoTrack =
+        [_factory videoTrackWithSource:source
+                               trackId:kARDVideoTrackId];
+//    }
 #endif
-  // source.useBackCamera = YES;
-  //_videoTrack = localVideoTrack;
-  return localVideoTrack;
-}
-
-- (RTCMediaStream *)createLocalAudioStream {
-  [[AppLogger sharedInstance]
-      logClass:NSStringFromClass([self class])
-       message:[NSString stringWithFormat:@"createLocalAudioStream"]];
-  RTCMediaStream *localStream = [_factory mediaStreamWithLabel:@"ARDAMS"];
-  [localStream addAudioTrack:[_factory audioTrackWithID:@"ARDAMSa0"]];
-  return localStream;
+    return localVideoTrack;
 }
 
 #pragma mark - Collider methods
@@ -899,65 +1036,51 @@ static NSInteger const kARDAppClientErrorInvalidRoom = -6;
                                                 restURL:_websocketRestURL
                                                delegate:self];
   }
-  //  [_channel registerForRoomId:_roomId clientId:_clientId];
 }
 
 #pragma mark - Defaults
 
-- (RTCMediaConstraints *)defaultMediaStreamConstraints {
+- (RTCMediaConstraints *)defaultMediaAudioConstraints {
+    NSString *valueLevelControl = _shouldUseLevelControl ?
+    kRTCMediaConstraintsValueTrue : kRTCMediaConstraintsValueFalse;
+    NSDictionary *mandatoryConstraints = @{ kRTCMediaConstraintsLevelControl : valueLevelControl };
+    RTCMediaConstraints *constraints =
+    [[RTCMediaConstraints alloc] initWithMandatoryConstraints:mandatoryConstraints
+                                          optionalConstraints:nil];
+    return constraints;
+}
 
-  RTCMediaConstraints *constraints =
-      [[RTCMediaConstraints alloc] initWithMandatoryConstraints:nil
-                                            optionalConstraints:nil];
-  return constraints;
+- (RTCMediaConstraints *)cameraConstraints {
+    return _cameraConstraints;
 }
 
 - (RTCMediaConstraints *)defaultAnswerConstraints {
-  return [self defaultOfferConstraints];
+    return [self defaultOfferConstraints];
 }
 
 - (RTCMediaConstraints *)defaultOfferConstraints {
-  NSArray *mandatoryConstraints = @[
-    [[RTCPair alloc] initWithKey:@"OfferToReceiveAudio" value:@"true"],
-    [[RTCPair alloc] initWithKey:@"OfferToReceiveVideo" value:@"true"],
-
-  ];
-
-  NSArray *optionalConstraints = @[
-    ////                                     [[RTCPair alloc]
-    /// initWithKey:@"DtlsSrtpKeyAgreement" value:@"true"],
-    //[[RTCPair alloc] initWithKey:@"internalSctpDataChannels" value:@"true"],
-  ];
-
-  RTCMediaConstraints *constraints = [[RTCMediaConstraints alloc]
-      initWithMandatoryConstraints:mandatoryConstraints
-               optionalConstraints:optionalConstraints];
-  return constraints;
+    NSDictionary *mandatoryConstraints = @{
+                                           @"OfferToReceiveAudio" : @"true",
+                                           @"OfferToReceiveVideo" : @"true"
+                                           };
+    RTCMediaConstraints* constraints =
+    [[RTCMediaConstraints alloc]
+     initWithMandatoryConstraints:mandatoryConstraints
+     optionalConstraints:nil];
+    return constraints;
 }
 
 - (RTCMediaConstraints *)defaultPeerConnectionConstraints {
-  [[AppLogger sharedInstance]
-      logClass:NSStringFromClass([self class])
-       message:[NSString stringWithFormat:@"defaultPeerConnectionConstraints"]];
-  if (_defaultPeerConnectionConstraints) {
-    return _defaultPeerConnectionConstraints;
-  }
-  NSArray *optionalConstraints = @[
-    [[RTCPair alloc] initWithKey:@"DtlsSrtpKeyAgreement" value:@"true"],
-    //          [[RTCPair alloc] initWithKey:@"internalSctpDataChannels"
-    //          value:@"true"],
-  ];
-  RTCMediaConstraints *constraints = [[RTCMediaConstraints alloc]
-      initWithMandatoryConstraints:nil
-               optionalConstraints:optionalConstraints];
-  return constraints;
-}
-
-- (RTCICEServer *)defaultSTUNServer {
-  NSURL *defaultSTUNServerURL = [NSURL URLWithString:kARDDefaultSTUNServerUrl];
-  return [[RTCICEServer alloc] initWithURI:defaultSTUNServerURL
-                                  username:@""
-                                  password:@""];
+    if (_defaultPeerConnectionConstraints) {
+        return _defaultPeerConnectionConstraints;
+    }
+    NSString *value = _isLoopback ? @"false" : @"true";
+    NSDictionary *optionalConstraints = @{ @"DtlsSrtpKeyAgreement" : value };
+    RTCMediaConstraints* constraints =
+    [[RTCMediaConstraints alloc]
+     initWithMandatoryConstraints:nil
+     optionalConstraints:optionalConstraints];
+    return constraints;
 }
 
 #pragma mark - Errors
@@ -1008,11 +1131,12 @@ static NSInteger const kARDAppClientErrorInvalidRoom = -6;
 //}
 
 - (void)changeVideoStreaming {
-  RTCMediaStream *localStream = [_factory mediaStreamWithLabel:@"ARDAMS"];
-  if ([localStream.videoTracks count]) {
-    RTCVideoTrack *localVideoTrack = [localStream.videoTracks objectAtIndex:0];
-    [localVideoTrack setEnabled:_videoState];
-  }
+    for (RTCRtpSender* sender in _peerConnection.senders) {
+        if ([sender.senderId isEqualToString:kARDVideoTrackId]){
+            [sender.track setIsEnabled:_videoState];
+            break;
+        }
+    }
 }
 
 - (ShelterCallState)callState {
@@ -1027,14 +1151,14 @@ static NSInteger const kARDAppClientErrorInvalidRoom = -6;
   [[AppLogger sharedInstance]
       logClass:NSStringFromClass([self class])
        message:[NSString stringWithFormat:@"muteRemoteAudioStreaming"]];
-  [_remoteAudioTrack setEnabled:NO];
+  [_remoteAudioTrack setIsEnabled:NO];
 }
 
 - (void)resumeRemoteAudioStreaming {
   [[AppLogger sharedInstance]
       logClass:NSStringFromClass([self class])
        message:[NSString stringWithFormat:@"resumeRemoteAudioStreaming"]];
-  [_remoteAudioTrack setEnabled:YES];
+  [_remoteAudioTrack setIsEnabled:YES];
 }
 
 - (void)reconnectWebSocket {
@@ -1144,9 +1268,9 @@ static NSInteger const kARDAppClientErrorInvalidRoom = -6;
     NSLog(@"Audio Session Interruption case started.");
     _isMicrophoneAvailable = NO;
     for (RTCAudioTrack *audioTrack in _localMediaStream.audioTracks) {
-      [audioTrack setEnabled:NO];
+      [audioTrack setIsEnabled:NO];
     }
-    [_remoteAudioTrack setEnabled:NO];
+    [_remoteAudioTrack setIsEnabled:NO];
 
     //  [self destroyPeerConnection];
     // fork to handling method here...
@@ -1158,12 +1282,12 @@ static NSInteger const kARDAppClientErrorInvalidRoom = -6;
     _isMicrophoneAvailable = YES;
     for (RTCAudioTrack *audioTrack in _localMediaStream.audioTracks) {
       if (audioTrack == _remoteAudioTrack) {
-        [audioTrack setEnabled:_remoteAudioState];
+        [audioTrack setIsEnabled:_remoteAudioState];
       } else {
-        [audioTrack setEnabled:YES];
+        [audioTrack setIsEnabled:YES];
       }
     }
-    [_remoteAudioTrack setEnabled:_remoteAudioState];
+    [_remoteAudioTrack setIsEnabled:_remoteAudioState];
 
     // [self startPeerConnectionIfReady];
     // fork to handling method here...

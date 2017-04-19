@@ -12,9 +12,9 @@
 
 @implementation Utils
 
-NSString *kBaseRegistrationURL = @"http://148.83.247.2";
-NSString *kBaseRegistrationDomain = @"148.83.247.2";
-NSString *kDefaultLoggerURL = @"http://148.83.247.2/api/device/logger";
+NSString *kBaseRegistrationURL = @"https://voks.afk.no";
+NSString *kBaseRegistrationDomain = @"voks.afk.no";
+NSString *kDefaultLoggerURL = @"https://voks.afk.no/api/device/logger";
 
 + (void)setDeviceUID:(NSString *)deviceUID {
   KeychainItemWrapper *keychainItem =

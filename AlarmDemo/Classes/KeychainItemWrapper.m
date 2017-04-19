@@ -542,7 +542,7 @@
     
     OSStatus result;
     
-    
+    NSLog(@"%d",SecItemCopyMatching((CFDictionaryRef)genericPasswordQuery, (CFTypeRef *)&attributes));
     
     if (SecItemCopyMatching((CFDictionaryRef)genericPasswordQuery, (CFTypeRef *)&attributes) == noErr)
         
@@ -613,6 +613,25 @@
         // No previous item found; add the new one.
         
         result = SecItemAdd((CFDictionaryRef)[self dictionaryToSecItemFormat:keychainItemData], NULL);
+        
+        if (result == -25299){ // duplicate found
+            // First we need the attributes from the Keychain.
+            
+            updateItem = [NSMutableDictionary dictionaryWithDictionary:attributes];
+            
+            // Second we need to add the appropriate search key/values.
+            
+            [updateItem setObject:[genericPasswordQuery objectForKey:(id)kSecClass] forKey:(id)kSecClass];
+            
+            
+            
+            // Lastly, we need to set up the updated attribute list being careful to remove the class.
+            
+            NSMutableDictionary *tempCheck = [self dictionaryToSecItemFormat:keychainItemData];
+            
+            [tempCheck removeObjectForKey:(id)kSecClass];
+            result = SecItemUpdate((CFDictionaryRef)updateItem, (CFDictionaryRef)tempCheck);
+        }
         
         NSAssert( result == noErr, @"Couldn't add the Keychain Item." );
         

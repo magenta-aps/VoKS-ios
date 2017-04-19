@@ -7,16 +7,22 @@
 
 #import "AppDelegate.h"
 #import "StartController.h"
-#import "RTCPeerConnectionFactory.h"
+#import <WebRTC/RTCPeerConnectionFactory.h>
+//#import "RTCPeerConnectionFactory.h"
 #import "Keychain.h"
 #import "AlarmController.h"
 #import "StartController.h"
 #import "NotificationController.h"
 #import "Message.h"
 #import "Utils.h"
-#import "RTCLogging.h"
+#import <WebRTC/RTCLogging.h>
 #import "MediaPlayer/MPVolumeView.h"
 #import "AppLogger.h"
+
+#import <WebRTC/RTCFieldTrials.h>
+
+#import <WebRTC/RTCSSLAdapter.h>
+#import <WebRTC/RTCTracing.h>
 
 @interface AppDelegate ()
 
@@ -50,7 +56,7 @@
 - (BOOL)application:(UIApplication *)application
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
-  RTCSetMinDebugLogLevel(kRTCLoggingSeverityWarning);
+  RTCSetMinDebugLogLevel(RTCLoggingSeverityVerbose);
 
   UINavigationController *nvController = nil;
 
@@ -101,7 +107,14 @@
   [UIApplication sharedApplication].idleTimerDisabled = YES;
 
   // Override point for customization after application launch.
-  [RTCPeerConnectionFactory initializeSSL];
+  //[RTCPeerConnectionFactory initializeSSL];
+        NSDictionary *fieldTrials = @{
+                                      kRTCFieldTrialImprovedBitrateEstimateKey: kRTCFieldTrialEnabledValue,
+                                      kRTCFieldTrialH264HighProfileKey: kRTCFieldTrialEnabledValue,
+                                      };
+        RTCInitFieldTrialDictionary(fieldTrials);
+  RTCInitializeSSL();
+  RTCSetupInternalTracer();
 
   if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
     [self registerRemoteNotificationWithActions];
@@ -114,68 +127,68 @@
 
   self.window.rootViewController = nvController;
 
-  NSString *str1 = @"etSystemV";
-  NSString *str2 = @"eHUDEnabled";
-  NSString *selectorString =
-      [NSString stringWithFormat:@"s%@olum%@:forAudioCategory:", str1, str2];
-  SEL selector = NSSelectorFromString(selectorString);
+//  NSString *str1 = @"etSystemV";
+//  NSString *str2 = @"eHUDEnabled";
+//  NSString *selectorString =
+//      [NSString stringWithFormat:@"s%@olum%@:forAudioCategory:", str1, str2];
+//  SEL selector = NSSelectorFromString(selectorString);
+//
+//  if ([[UIApplication sharedApplication] respondsToSelector:selector]) {
+//    NSInvocation *invocation = [NSInvocation
+//        invocationWithMethodSignature:
+//            [UIApplication instanceMethodSignatureForSelector:selector]];
+//    invocation.selector = selector;
+//    invocation.target = [UIApplication sharedApplication];
+//    BOOL value = NO;
+//    [invocation setArgument:&value atIndex:2];
+//    __unsafe_unretained NSString *category = @"Ringtone";
+//    [invocation setArgument:&category atIndex:3];
+//    [invocation invoke];
+//  }
 
-  if ([[UIApplication sharedApplication] respondsToSelector:selector]) {
-    NSInvocation *invocation = [NSInvocation
-        invocationWithMethodSignature:
-            [UIApplication instanceMethodSignatureForSelector:selector]];
-    invocation.selector = selector;
-    invocation.target = [UIApplication sharedApplication];
-    BOOL value = NO;
-    [invocation setArgument:&value atIndex:2];
-    __unsafe_unretained NSString *category = @"Ringtone";
-    [invocation setArgument:&category atIndex:3];
-    [invocation invoke];
-  }
+//  if ([[UIApplication sharedApplication] respondsToSelector:selector]) {
+//    NSInvocation *invocation = [NSInvocation
+//        invocationWithMethodSignature:
+//            [UIApplication instanceMethodSignatureForSelector:selector]];
+//    invocation.selector = selector;
+//    invocation.target = [UIApplication sharedApplication];
+//    BOOL value = NO;
+//    [invocation setArgument:&value atIndex:2];
+//    __unsafe_unretained NSString *category = @"Audio/Video";
+//    [invocation setArgument:&category atIndex:3];
+//    [invocation invoke];
+//  }
+//
+//  float zeroVolume = 0.0f;
+//  Class avSystemControllerClass = NSClassFromString(@"AVSystemController");
+//  id avSystemControllerInstance = [avSystemControllerClass
+//      performSelector:@selector(sharedAVSystemController)];
 
-  if ([[UIApplication sharedApplication] respondsToSelector:selector]) {
-    NSInvocation *invocation = [NSInvocation
-        invocationWithMethodSignature:
-            [UIApplication instanceMethodSignatureForSelector:selector]];
-    invocation.selector = selector;
-    invocation.target = [UIApplication sharedApplication];
-    BOOL value = NO;
-    [invocation setArgument:&value atIndex:2];
-    __unsafe_unretained NSString *category = @"Audio/Video";
-    [invocation setArgument:&category atIndex:3];
-    [invocation invoke];
-  }
+//  NSString *soundCategory = @"Ringtone";
 
-  float zeroVolume = 0.0f;
-  Class avSystemControllerClass = NSClassFromString(@"AVSystemController");
-  id avSystemControllerInstance = [avSystemControllerClass
-      performSelector:@selector(sharedAVSystemController)];
+//    float currentVolumeRinger = 0;
+//    NSInvocation *getCurrentVolume = [NSInvocation
+//        invocationWithMethodSignature:[avSystemControllerClass
+//                                          instanceMethodSignatureForSelector:
+//                                              @selector(getVolume:forCategory:)]];
+//    [getCurrentVolume setTarget:avSystemControllerInstance];
+//    [getCurrentVolume setSelector:@selector(getVolume:forCategory:)];
+//    [getCurrentVolume setArgument:&currentVolumeRinger atIndex:2];
+//    [getCurrentVolume setArgument:&soundCategory atIndex:3];
+//    [getCurrentVolume invoke];
+//
+//    NSLog(@"Current Volume: %f", currentVolumeRinger);
 
-  NSString *soundCategory = @"Ringtone";
-
-  //  float currentVolumeRinger;
-  //  NSInvocation *getCurrentVolume = [NSInvocation
-  //      invocationWithMethodSignature:[avSystemControllerClass
-  //                                        instanceMethodSignatureForSelector:
-  //                                            @selector(getVolume:forCategory:)]];
-  //  [getCurrentVolume setTarget:avSystemControllerInstance];
-  //  [getCurrentVolume setSelector:@selector(getVolume:forCategory:)];
-  //  [getCurrentVolume setArgument:&currentVolumeRinger atIndex:2];
-  //  [getCurrentVolume setArgument:&soundCategory atIndex:3];
-  //  [getCurrentVolume invoke];
-
-  //  NSLog(@"Current Volume: %f", currentVolumeRinger);
-
-  NSInvocation *volumeInvocation = [NSInvocation
-      invocationWithMethodSignature:
-          [avSystemControllerClass
-              instanceMethodSignatureForSelector:@selector(setVolumeTo:
-                                                           forCategory:)]];
-  [volumeInvocation setTarget:avSystemControllerInstance];
-  [volumeInvocation setSelector:@selector(setVolumeTo:forCategory:)];
-  [volumeInvocation setArgument:&zeroVolume atIndex:2];
-  [volumeInvocation setArgument:&soundCategory atIndex:3];
-  [volumeInvocation invoke];
+//  NSInvocation *volumeInvocation = [NSInvocation
+//      invocationWithMethodSignature:
+//          [avSystemControllerClass
+//              instanceMethodSignatureForSelector:@selector(setVolumeTo:
+//                                                           forCategory:)]];
+//  [volumeInvocation setTarget:avSystemControllerInstance];
+//  [volumeInvocation setSelector:@selector(setVolumeTo:forCategory:)];
+//  [volumeInvocation setArgument:&zeroVolume atIndex:2];
+//  [volumeInvocation setArgument:&soundCategory atIndex:3];
+//  [volumeInvocation invoke];
 
   // Hacky stuff to find Volume View
   MPVolumeView *volumeView = [[MPVolumeView alloc] init];
@@ -234,8 +247,11 @@
 - (void)applicationWillTerminate:(UIApplication *)application {
   // Called when the application is about to terminate. Save data if
   // appropriate. See also applicationDidEnterBackground:.
-  [RTCPeerConnectionFactory deinitializeSSL];
-
+  //[RTCPeerConnectionFactory deinitializeSSL];
+  RTCShutdownInternalTracer();
+  RTCCleanupSSL();
+    
+    
   UINavigationController *nvController =
       (UINavigationController *)self.window.rootViewController;
 

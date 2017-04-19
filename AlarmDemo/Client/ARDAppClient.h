@@ -32,8 +32,8 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RTCVideoTrack.h"
-#import "RTCDataChannel.h"
+#import <WebRTC/RTCVideoTrack.h>
+#import <WebRTC/RTCPeerConnection.h>
 #import "Message.h"
 
 typedef NS_ENUM(NSInteger, ARDAppClientState) {
@@ -73,6 +73,7 @@ typedef NS_ENUM(NSInteger, ShelterCallState) {
 //};
 
 @class ARDAppClient;
+@class RTCMediaConstraints;
 // The delegate is informed of pertinent events and will be called on the
 // main queue.
 @protocol ARDAppClientDelegate <NSObject>
@@ -81,7 +82,7 @@ typedef NS_ENUM(NSInteger, ShelterCallState) {
    didChangeState:(ARDAppClientState)state;
 
 - (void)appClient:(ARDAppClient *)client
-    didChangeConnectionState:(RTCICEConnectionState)state;
+    didChangeConnectionState:(RTCIceConnectionState)state;
 
 - (void)appClient:(ARDAppClient *)client
     didReceiveLocalVideoTrack:(RTCVideoTrack *)localVideoTrack;
@@ -121,6 +122,12 @@ typedef NS_ENUM(NSInteger, ShelterCallState) {
 // Convenience constructor since all expected use cases will need a delegate
 // in order to receive remote tracks.
 - (instancetype)initWithDelegate:(id<ARDAppClientDelegate>)delegate;
+
+// Sets camera constraints.
+- (void)setCameraConstraints:(RTCMediaConstraints *)mediaConstraints;
+
+// Sets maximum bitrate the rtp sender should use.
+- (void)setMaxBitrate:(NSNumber *)maxBitrate;
 
 // Establishes a connection with the AppRTC servers for the given room id.
 // TODO(tkchin): provide available keys/values for options. This will be used

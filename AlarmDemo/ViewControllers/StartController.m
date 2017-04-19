@@ -144,7 +144,7 @@
                        self.loadingLabel.alpha = 1;
                        self.lNetworkError.alpha = 0;
                      }];
-    [self registerDevice];
+    [self callRegisterDevice];
   } else {
     [UIView animateWithDuration:0.25
                      animations:^{
@@ -258,25 +258,27 @@
 - (void)registerDevice:(void (^)(NSDictionary *response))successBlock
           failureBlock:(void (^)(NSError *error))failureBlock {
 
-  NSURLSession *session = [NSURLSession sharedSession];
-  [[session dataTaskWithURL:
+    NSURLSessionConfiguration *defaultConfigObject = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *defaultSession = [NSURLSession sessionWithConfiguration: defaultConfigObject delegate: self delegateQueue: [NSOperationQueue mainQueue]];
+  [[defaultSession dataTaskWithURL:
                 [NSURL URLWithString:
                            [NSString
                                stringWithFormat:
                                    @"%@/api/voks/"
                                    @"register-device?device_type=ios&device_"
-                                   @"id=%@&gcm_id=%@&lang=%@",
+                                   @"id=%@&gcm_id=%@",
                                    kBaseRegistrationURL, [Utils deviceUID],
                                    [[NSUserDefaults standardUserDefaults]
                                        stringForKey:@"APNS_ID"]
                                        ? [[NSUserDefaults standardUserDefaults]
                                              stringForKey:@"APNS_ID"]
-                                       : @"",[[NSLocale preferredLanguages] objectAtIndex:0]]]
+                                       : @""]]
           completionHandler:^(NSData *data, NSURLResponse *response,
                               NSError *errorRequest) {
             // handle response
             if (errorRequest != nil) {
               failureBlock(errorRequest);
+                return;
             }
 
             NSError *errorJson = nil;
@@ -287,9 +289,11 @@
 
             if (errorJson != nil) {
               failureBlock(errorJson);
+                return;
             }
 
             successBlock(responseDict);
+              return;
 
           }] resume];
 }
@@ -298,22 +302,23 @@
             (void (^)(NSDictionary *response))successBlock
                                   failureBlock:
                                       (void (^)(NSError *error))failureBlock {
-  NSURLSession *session = [NSURLSession sharedSession];
-  session.configuration.timeoutIntervalForRequest = 5;
-  session.configuration.timeoutIntervalForResource = 10;
-  [[session dataTaskWithURL:
+    NSURLSessionConfiguration *defaultConfigObject = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *defaultSession = [NSURLSession sessionWithConfiguration: defaultConfigObject delegate: self delegateQueue: [NSOperationQueue mainQueue]];
+    defaultSession.configuration.timeoutIntervalForRequest = 5;
+    defaultSession.configuration.timeoutIntervalForResource = 10;
+    [[defaultSession dataTaskWithURL:
                 [NSURL URLWithString:
                            [NSString
                                stringWithFormat:
                                    @"%@/api/voks/"
                                    @"register-device?device_type=ios&device_"
-                                   @"id=%@&gcm_id=%@&lang=%@",
+                                   @"id=%@&gcm_id=%@",
                                    kBaseRegistrationURL, [Utils deviceUID],
                                    [[NSUserDefaults standardUserDefaults]
                                        stringForKey:@"APNS_ID"]
                                        ? [[NSUserDefaults standardUserDefaults]
                                              stringForKey:@"APNS_ID"]
-                                       : @"",[[NSLocale preferredLanguages] objectAtIndex:0]] ]
+                                       : @""]]
           completionHandler:^(NSData *data, NSURLResponse *response,
                               NSError *errorRequest) {
             // handle response
@@ -344,7 +349,7 @@
           _lNetworkError.text = [registrationResponse valueForKey:@"message"];
           _lNetworkError.alpha = 1;
           _loadingLabel.alpha = 0;
-          [self performSelector:@selector(registerDevice)
+          [self performSelector:@selector(callRegisterDevice)
                      withObject:nil
                      afterDelay:3];
       });
@@ -369,7 +374,7 @@
   }
 }
 
-- (void)registerDevice {
+- (void)callRegisterDevice {
   dispatch_async(dispatch_get_main_queue(), ^{
     _lNetworkError.alpha = 0;
     _loadingLabel.alpha = 1;
@@ -384,10 +389,9 @@
                        stringWithFormat:@"Error while updating user device: %@",
                                         error.description]];
       dispatch_async(dispatch_get_main_queue(), ^{
-        _lNetworkError.text = NSLocalizedString(@"check_connection", nil);
         _lNetworkError.alpha = 1;
         _loadingLabel.alpha = 0;
-        [self performSelector:@selector(registerDevice)
+        [self performSelector:@selector(callRegisterDevice)
                    withObject:nil
                    afterDelay:3];
       });
@@ -398,10 +402,9 @@
       [self parseRegistrationInfo:response];
     } failureBlock:^(NSError *error) {
       dispatch_async(dispatch_get_main_queue(), ^{
-        _lNetworkError.text = NSLocalizedString(@"check_connection", nil);
         _lNetworkError.alpha = 1;
         _loadingLabel.alpha = 0;
-        [self performSelector:@selector(registerDevice)
+        [self performSelector:@selector(callRegisterDevice)
                    withObject:nil
                    afterDelay:3];
       });
@@ -414,6 +417,12 @@
     }];
   }
 }
+
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler
+{
+    completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
+}
+
 
 - (BOOL)hasPushNotificationPermission {
   BOOL remoteNotificationsEnabled = NO;
