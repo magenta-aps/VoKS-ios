@@ -1,11 +1,13 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_5" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
-        <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
-        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
-        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="AlarmController">
@@ -31,79 +33,89 @@
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT" userLabel="Parent">
-            <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+            <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="p88-3z-OHU" userLabel="bg bar">
-                    <rect key="frame" x="0.0" y="0.0" width="600" height="20"/>
-                    <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="20" id="K3w-sv-acM"/>
-                    </constraints>
+                    <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                    <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 </view>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qqd-Ec-dRR" userLabel="action bar">
-                    <rect key="frame" x="0.0" y="20" width="600" height="55"/>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Nbn-I0-Aq8">
+                    <rect key="frame" x="0.0" y="44" width="414" height="55"/>
                     <subviews>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rGi-o9-WE7">
-                            <rect key="frame" x="0.0" y="0.0" width="300" height="55"/>
-                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="18"/>
-                            <state key="normal" title="Call Police" image="police_btn_icon_active.png">
-                                <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                            </state>
-                            <connections>
-                                <action selector="onCallPoliceClicked:" destination="-1" eventType="touchUpInside" id="Hwz-Vq-iFg"/>
-                            </connections>
-                        </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Wnv-sV-rQ6">
-                            <rect key="frame" x="300" y="0.0" width="300" height="55"/>
-                            <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="18"/>
-                            <state key="normal" title="Hide">
-                                <color key="titleColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                            </state>
-                            <connections>
-                                <action selector="onHideClicked:" destination="-1" eventType="touchUpInside" id="6XB-5p-ufb"/>
-                            </connections>
-                        </button>
-                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="police_btn_line_active.png" translatesAutoresizingMaskIntoConstraints="NO" id="lrB-Xb-xve" userLabel="Bottom Line">
-                            <rect key="frame" x="0.0" y="44" width="300" height="11"/>
-                        </imageView>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kke-B2-Wir" userLabel="Separator">
-                            <rect key="frame" x="0.0" y="54" width="600" height="1"/>
-                            <color key="backgroundColor" red="0.71764705882352942" green="0.71764705882352942" blue="0.71764705882352942" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qqd-Ec-dRR" userLabel="action bar">
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="55"/>
+                            <subviews>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rGi-o9-WE7">
+                                    <rect key="frame" x="0.0" y="0.0" width="207" height="55"/>
+                                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="18"/>
+                                    <state key="normal" title="Call Police" image="police_btn_icon_active.png">
+                                        <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="onCallPoliceClicked:" destination="-1" eventType="touchUpInside" id="Hwz-Vq-iFg"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Wnv-sV-rQ6">
+                                    <rect key="frame" x="207" y="0.0" width="207" height="55"/>
+                                    <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="18"/>
+                                    <state key="normal" title="Hide">
+                                        <color key="titleColor" red="0.66666668653488159" green="0.66666668653488159" blue="0.66666668653488159" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="onHideClicked:" destination="-1" eventType="touchUpInside" id="6XB-5p-ufb"/>
+                                    </connections>
+                                </button>
+                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="police_btn_line_active.png" translatesAutoresizingMaskIntoConstraints="NO" id="lrB-Xb-xve" userLabel="Bottom Line">
+                                    <rect key="frame" x="0.0" y="44" width="207" height="11"/>
+                                </imageView>
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kke-B2-Wir" userLabel="Separator">
+                                    <rect key="frame" x="0.0" y="54" width="414" height="1"/>
+                                    <color key="backgroundColor" red="0.66014617681503296" green="0.6601264476776123" blue="0.66013765335083008" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="1" id="7P7-d0-cVL"/>
+                                    </constraints>
+                                </view>
+                            </subviews>
+                            <color key="backgroundColor" red="0.87450980389999999" green="0.87450980389999999" blue="0.87450980389999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <constraints>
-                                <constraint firstAttribute="height" constant="1" id="7P7-d0-cVL"/>
+                                <constraint firstItem="lrB-Xb-xve" firstAttribute="height" secondItem="rGi-o9-WE7" secondAttribute="height" multiplier="0.2" id="3aW-5G-ClT"/>
+                                <constraint firstItem="Wnv-sV-rQ6" firstAttribute="top" secondItem="qqd-Ec-dRR" secondAttribute="top" id="7Ru-Nt-Lpp"/>
+                                <constraint firstItem="Wnv-sV-rQ6" firstAttribute="trailing" secondItem="qqd-Ec-dRR" secondAttribute="trailing" id="82t-ip-nkH"/>
+                                <constraint firstAttribute="bottom" secondItem="Wnv-sV-rQ6" secondAttribute="bottom" id="9QB-Mq-NmS"/>
+                                <constraint firstAttribute="height" constant="55" id="BMp-zZ-lT1"/>
+                                <constraint firstItem="rGi-o9-WE7" firstAttribute="leading" secondItem="qqd-Ec-dRR" secondAttribute="leading" id="GzM-eZ-wiq"/>
+                                <constraint firstAttribute="bottom" secondItem="rGi-o9-WE7" secondAttribute="bottom" id="NgU-aM-gK3"/>
+                                <constraint firstAttribute="bottom" secondItem="kke-B2-Wir" secondAttribute="bottom" id="WZD-Ql-NFh"/>
+                                <constraint firstItem="Wnv-sV-rQ6" firstAttribute="leading" secondItem="rGi-o9-WE7" secondAttribute="trailing" id="XR3-7B-LJr"/>
+                                <constraint firstItem="rGi-o9-WE7" firstAttribute="trailing" secondItem="qqd-Ec-dRR" secondAttribute="centerX" id="ajX-Cd-TSE"/>
+                                <constraint firstItem="lrB-Xb-xve" firstAttribute="leading" secondItem="rGi-o9-WE7" secondAttribute="leading" id="hXh-3q-xXr"/>
+                                <constraint firstItem="lrB-Xb-xve" firstAttribute="width" secondItem="rGi-o9-WE7" secondAttribute="width" id="kxp-Gb-YZF"/>
+                                <constraint firstItem="rGi-o9-WE7" firstAttribute="top" secondItem="qqd-Ec-dRR" secondAttribute="top" id="tIV-yo-39T"/>
+                                <constraint firstItem="kke-B2-Wir" firstAttribute="trailing" secondItem="qqd-Ec-dRR" secondAttribute="trailing" id="udm-ox-rAE"/>
+                                <constraint firstItem="kke-B2-Wir" firstAttribute="leading" secondItem="qqd-Ec-dRR" secondAttribute="leading" id="vvQ-wV-jVE"/>
+                                <constraint firstItem="lrB-Xb-xve" firstAttribute="bottom" secondItem="rGi-o9-WE7" secondAttribute="bottom" id="yna-oh-sKs"/>
                             </constraints>
                         </view>
                     </subviews>
-                    <color key="backgroundColor" red="0.87450980389999999" green="0.87450980389999999" blue="0.87450980389999999" alpha="1" colorSpace="calibratedRGB"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
-                        <constraint firstItem="lrB-Xb-xve" firstAttribute="height" secondItem="rGi-o9-WE7" secondAttribute="height" multiplier="0.2" id="3aW-5G-ClT"/>
-                        <constraint firstItem="Wnv-sV-rQ6" firstAttribute="top" secondItem="qqd-Ec-dRR" secondAttribute="top" id="7Ru-Nt-Lpp"/>
-                        <constraint firstItem="Wnv-sV-rQ6" firstAttribute="trailing" secondItem="qqd-Ec-dRR" secondAttribute="trailing" id="82t-ip-nkH"/>
-                        <constraint firstAttribute="bottom" secondItem="Wnv-sV-rQ6" secondAttribute="bottom" id="9QB-Mq-NmS"/>
-                        <constraint firstAttribute="height" constant="55" id="BMp-zZ-lT1"/>
-                        <constraint firstItem="rGi-o9-WE7" firstAttribute="leading" secondItem="qqd-Ec-dRR" secondAttribute="leading" id="GzM-eZ-wiq"/>
-                        <constraint firstAttribute="bottom" secondItem="rGi-o9-WE7" secondAttribute="bottom" id="NgU-aM-gK3"/>
-                        <constraint firstAttribute="bottom" secondItem="kke-B2-Wir" secondAttribute="bottom" id="WZD-Ql-NFh"/>
-                        <constraint firstItem="Wnv-sV-rQ6" firstAttribute="leading" secondItem="rGi-o9-WE7" secondAttribute="trailing" id="XR3-7B-LJr"/>
-                        <constraint firstItem="rGi-o9-WE7" firstAttribute="trailing" secondItem="qqd-Ec-dRR" secondAttribute="centerX" id="ajX-Cd-TSE"/>
-                        <constraint firstItem="lrB-Xb-xve" firstAttribute="leading" secondItem="rGi-o9-WE7" secondAttribute="leading" id="hXh-3q-xXr"/>
-                        <constraint firstItem="lrB-Xb-xve" firstAttribute="width" secondItem="rGi-o9-WE7" secondAttribute="width" id="kxp-Gb-YZF"/>
-                        <constraint firstItem="rGi-o9-WE7" firstAttribute="top" secondItem="qqd-Ec-dRR" secondAttribute="top" id="tIV-yo-39T"/>
-                        <constraint firstItem="kke-B2-Wir" firstAttribute="trailing" secondItem="qqd-Ec-dRR" secondAttribute="trailing" id="udm-ox-rAE"/>
-                        <constraint firstItem="kke-B2-Wir" firstAttribute="leading" secondItem="qqd-Ec-dRR" secondAttribute="leading" id="vvQ-wV-jVE"/>
-                        <constraint firstItem="lrB-Xb-xve" firstAttribute="bottom" secondItem="rGi-o9-WE7" secondAttribute="bottom" id="yna-oh-sKs"/>
+                        <constraint firstItem="qqd-Ec-dRR" firstAttribute="bottom" secondItem="7Hm-nE-f9f" secondAttribute="bottom" id="6DA-cN-Alz"/>
+                        <constraint firstItem="qqd-Ec-dRR" firstAttribute="leading" secondItem="Nbn-I0-Aq8" secondAttribute="leading" id="7oe-sh-6Cp"/>
+                        <constraint firstAttribute="trailing" secondItem="qqd-Ec-dRR" secondAttribute="trailing" id="toA-Ch-dck"/>
+                        <constraint firstItem="qqd-Ec-dRR" firstAttribute="top" secondItem="7Hm-nE-f9f" secondAttribute="top" id="uzk-01-m6U"/>
                     </constraints>
+                    <viewLayoutGuide key="safeArea" id="7Hm-nE-f9f"/>
                 </view>
                 <tableView clipsSubviews="YES" contentMode="scaleToFill" placeholderIntrinsicWidth="600" placeholderIntrinsicHeight="496" alwaysBounceVertical="YES" style="plain" separatorStyle="none" allowsSelection="NO" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="19P-u5-hnX">
-                    <rect key="frame" x="0.0" y="75" width="600" height="475"/>
-                    <color key="backgroundColor" red="0.87058823529411766" green="0.87058823529411766" blue="0.87058823529411766" alpha="1" colorSpace="calibratedRGB"/>
+                    <rect key="frame" x="0.0" y="99" width="414" height="713"/>
+                    <color key="backgroundColor" red="0.87058823529411766" green="0.87058823529411766" blue="0.87058823529411766" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 </tableView>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6qn-ju-vAv" userLabel="keyboard bar">
-                    <rect key="frame" x="0.0" y="550" width="600" height="50"/>
+                    <rect key="frame" x="0.0" y="812" width="414" height="50"/>
                     <subviews>
                         <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="w0z-XI-e2u">
                             <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
@@ -111,40 +123,40 @@
                                 <constraint firstAttribute="width" secondItem="w0z-XI-e2u" secondAttribute="height" multiplier="1:1" id="94R-zV-NVp"/>
                             </constraints>
                             <state key="normal" backgroundImage="call_inactive.png">
-                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </state>
                             <connections>
                                 <action selector="onCallToShelterClicked:" destination="-1" eventType="touchUpInside" id="y3D-ew-hpZ"/>
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3Z4-Of-ewT">
-                            <rect key="frame" x="542" y="0.0" width="50" height="50"/>
+                            <rect key="frame" x="356" y="0.0" width="50" height="50"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="3Z4-Of-ewT" secondAttribute="height" multiplier="1:1" id="PS4-Pp-XHe"/>
                             </constraints>
                             <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="18"/>
                             <state key="normal" title="Send">
-                                <color key="titleColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="titleColor" red="0.66666668653488159" green="0.66666668653488159" blue="0.66666668653488159" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </state>
                             <connections>
                                 <action selector="onSendClicked:" destination="-1" eventType="touchUpInside" id="zf4-BX-oj0"/>
                             </connections>
                         </button>
                         <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Type message" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="svw-Qa-DY6">
-                            <rect key="frame" x="60" y="5" width="472" height="40"/>
-                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <rect key="frame" x="60" y="5" width="286" height="40"/>
+                            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                             <textInputTraits key="textInputTraits" returnKeyType="send"/>
                         </textField>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="YWF-Bw-zpo" userLabel="Separator">
-                            <rect key="frame" x="0.0" y="0.0" width="600" height="1"/>
-                            <color key="backgroundColor" red="0.71764705882352942" green="0.71764705882352942" blue="0.71764705882352942" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="1"/>
+                            <color key="backgroundColor" red="0.66014617681503296" green="0.6601264476776123" blue="0.66013765335083008" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="1" id="tb8-Nt-EFb"/>
                             </constraints>
                         </view>
                     </subviews>
-                    <color key="backgroundColor" red="0.87058823529999996" green="0.87058823529999996" blue="0.87058823529999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <color key="backgroundColor" red="0.83988994359970093" green="0.83986485004425049" blue="0.83987903594970703" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <constraints>
                         <constraint firstItem="svw-Qa-DY6" firstAttribute="leading" secondItem="w0z-XI-e2u" secondAttribute="trailing" constant="10" id="3Fg-4e-XDD"/>
                         <constraint firstAttribute="bottom" secondItem="w0z-XI-e2u" secondAttribute="bottom" id="NOi-gD-F7t"/>
@@ -164,46 +176,46 @@
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1Nx-rv-Gaa" userLabel="Holder">
-                    <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                    <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9ce-eM-euz" userLabel="Red Part">
-                            <rect key="frame" x="0.0" y="0.0" width="600" height="300"/>
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="448"/>
                             <subviews>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lvQ-7n-5Qa" userLabel="Inner Holder">
-                                    <rect key="frame" x="150" y="50" width="300" height="200"/>
+                                    <rect key="frame" x="103.66666666666669" y="124.33333333333333" width="207" height="199.66666666666669"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uNe-uZ-KJV">
-                                            <rect key="frame" x="58" y="0.0" width="183" height="91"/>
+                                            <rect key="frame" x="12" y="0.0" width="183" height="90.666666666666671"/>
                                             <string key="text">ALARM IS
 ACTIVE</string>
                                             <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="38"/>
-                                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Hide app or call the police" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mJB-Lk-P5X">
-                                            <rect key="frame" x="54" y="99" width="191" height="21"/>
+                                            <rect key="frame" x="8" y="98.666666666666671" width="191" height="21"/>
                                             <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
-                                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="G7J-W3-kd8">
-                                            <rect key="frame" x="0.0" y="145" width="300" height="55"/>
-                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <rect key="frame" x="0.0" y="144.66666666666669" width="207" height="55"/>
+                                            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="18"/>
                                             <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="10" maxY="0.0"/>
                                             <state key="normal" title="Call police" image="police_btn_icon_active.png">
-                                                <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                                <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             </state>
                                             <connections>
                                                 <action selector="onCallPoliceClicked:" destination="-1" eventType="touchUpInside" id="dYK-hC-i2c"/>
                                             </connections>
                                         </button>
                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="police_btn_line_active.png" translatesAutoresizingMaskIntoConstraints="NO" id="9PP-2m-FSR" userLabel="Bottom Line">
-                                            <rect key="frame" x="0.0" y="189" width="300" height="11"/>
+                                            <rect key="frame" x="0.0" y="188.66666666666669" width="207" height="11"/>
                                         </imageView>
                                     </subviews>
-                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                     <constraints>
                                         <constraint firstItem="G7J-W3-kd8" firstAttribute="leading" secondItem="lvQ-7n-5Qa" secondAttribute="leading" id="F9N-f0-o2N"/>
                                         <constraint firstAttribute="bottom" secondItem="9PP-2m-FSR" secondAttribute="bottom" id="GnE-EG-JFG"/>
@@ -226,7 +238,7 @@ ACTIVE</string>
                                     </variation>
                                 </view>
                             </subviews>
-                            <color key="backgroundColor" red="0.74509803921568629" green="0.050980392156862744" blue="0.066666666666666666" alpha="1" colorSpace="calibratedRGB"/>
+                            <color key="backgroundColor" red="0.74509803921568629" green="0.050980392156862744" blue="0.066666666666666666" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <constraints>
                                 <constraint firstAttribute="centerX" secondItem="lvQ-7n-5Qa" secondAttribute="centerX" id="fL0-p6-xq6"/>
                                 <constraint firstAttribute="centerY" secondItem="lvQ-7n-5Qa" secondAttribute="centerY" id="rom-bv-ice"/>
@@ -234,30 +246,30 @@ ACTIVE</string>
                             </constraints>
                         </view>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="wordWrap" translatesAutoresizingMaskIntoConstraints="NO" id="Niu-L5-BQf" userLabel="TAP HERE TO CHAT">
-                            <rect key="frame" x="0.0" y="300" width="600" height="150"/>
-                            <color key="backgroundColor" red="0.7803921568627451" green="0.7803921568627451" blue="0.7803921568627451" alpha="1" colorSpace="calibratedRGB"/>
+                            <rect key="frame" x="0.0" y="448" width="414" height="224"/>
+                            <color key="backgroundColor" red="0.7803921568627451" green="0.7803921568627451" blue="0.7803921568627451" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <state key="normal">
                                 <string key="title">Can you tell us something about the situation? 
 TAP HERE TO CHAT</string>
-                                <color key="titleColor" red="0.32549019607843138" green="0.32549019607843138" blue="0.32549019607843138" alpha="1" colorSpace="calibratedRGB"/>
-                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="titleColor" red="0.32549019607843138" green="0.32549019607843138" blue="0.32549019607843138" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </state>
                             <connections>
                                 <action selector="onSeeChatClicked:" destination="-1" eventType="touchUpInside" id="WEz-g8-ViP"/>
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Xw4-7T-z9n">
-                            <rect key="frame" x="0.0" y="450" width="600" height="150"/>
-                            <color key="backgroundColor" red="0.32549019610000002" green="0.32549019610000002" blue="0.32549019610000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <rect key="frame" x="0.0" y="672" width="414" height="224"/>
+                            <color key="backgroundColor" red="0.25671812891960144" green="0.25671043992042542" blue="0.25671476125717163" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <state key="normal" title="TAP HERE TO HIDE">
-                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </state>
                             <connections>
                                 <action selector="onHideClicked:" destination="-1" eventType="touchUpInside" id="Axl-fY-wNy"/>
                             </connections>
                         </button>
                     </subviews>
-                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <constraints>
                         <constraint firstItem="Niu-L5-BQf" firstAttribute="height" secondItem="1Nx-rv-Gaa" secondAttribute="height" multiplier="0.25" id="4hZ-3f-8kC"/>
                         <constraint firstItem="9ce-eM-euz" firstAttribute="top" secondItem="1Nx-rv-Gaa" secondAttribute="top" id="7SV-7g-KVn"/>
@@ -280,16 +292,16 @@ TAP HERE TO CHAT</string>
                     </variation>
                 </view>
                 <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="w6u-AL-wgB" userLabel="dim view">
-                    <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                    <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                     <subviews>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tap to see chat" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hC9-7y-Ckj">
-                            <rect key="frame" x="241" y="289" width="118" height="21"/>
+                            <rect key="frame" x="148.66666666666666" y="438" width="116.99999999999997" height="20.333333333333314"/>
                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <nil key="highlightedColor"/>
                         </label>
                     </subviews>
-                    <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                    <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <constraints>
                         <constraint firstAttribute="centerX" secondItem="hC9-7y-Ckj" secondAttribute="centerX" id="Jbw-Nb-sti"/>
                         <constraint firstItem="hC9-7y-Ckj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="w6u-AL-wgB" secondAttribute="leading" constant="20" id="T5g-iZ-5Vf"/>
@@ -298,38 +310,38 @@ TAP HERE TO CHAT</string>
                     </constraints>
                 </view>
             </subviews>
-            <color key="backgroundColor" red="0.87058823529999996" green="0.87058823529999996" blue="0.87058823529999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color key="backgroundColor" red="0.83988994359970093" green="0.83986485004425049" blue="0.83987903594970703" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
                 <constraint firstItem="19P-u5-hnX" firstAttribute="trailing" secondItem="i5M-Pr-FkT" secondAttribute="trailing" id="1KZ-DD-GHf"/>
                 <constraint firstAttribute="trailing" secondItem="w6u-AL-wgB" secondAttribute="trailing" id="EeW-hG-bed"/>
                 <constraint firstAttribute="trailing" secondItem="p88-3z-OHU" secondAttribute="trailing" id="J2R-Sa-uiR"/>
                 <constraint firstItem="p88-3z-OHU" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="K1P-s4-IIn"/>
-                <constraint firstAttribute="trailing" secondItem="qqd-Ec-dRR" secondAttribute="trailing" id="KGc-F0-bCU"/>
-                <constraint firstItem="qqd-Ec-dRR" firstAttribute="top" secondItem="p88-3z-OHU" secondAttribute="bottom" id="L6s-OY-AkO"/>
+                <constraint firstItem="puy-fb-B7C" firstAttribute="top" secondItem="p88-3z-OHU" secondAttribute="bottom" id="Lhl-Tg-sWK"/>
                 <constraint firstItem="1Nx-rv-Gaa" firstAttribute="bottom" secondItem="i5M-Pr-FkT" secondAttribute="bottom" id="MxD-YT-jNt"/>
+                <constraint firstAttribute="trailing" secondItem="Nbn-I0-Aq8" secondAttribute="trailing" id="R2r-zc-PYt"/>
                 <constraint firstItem="19P-u5-hnX" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="Tld-q2-QBx"/>
                 <constraint firstAttribute="trailing" secondItem="6qn-ju-vAv" secondAttribute="trailing" id="UDN-4P-K9V"/>
                 <constraint firstItem="w6u-AL-wgB" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="UbW-My-aAq"/>
                 <constraint firstAttribute="trailing" secondItem="1Nx-rv-Gaa" secondAttribute="trailing" id="Uw3-At-gJ2"/>
                 <constraint firstItem="w6u-AL-wgB" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="Vp1-FP-M3x"/>
-                <constraint firstItem="19P-u5-hnX" firstAttribute="top" secondItem="qqd-Ec-dRR" secondAttribute="bottom" id="WhB-Pt-vja"/>
-                <constraint firstItem="qqd-Ec-dRR" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="bKe-dF-uek"/>
+                <constraint firstItem="19P-u5-hnX" firstAttribute="top" secondItem="Nbn-I0-Aq8" secondAttribute="bottom" id="als-71-xiG"/>
                 <constraint firstItem="6qn-ju-vAv" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="coI-Y5-sDO"/>
-                <constraint firstItem="19P-u5-hnX" firstAttribute="top" secondItem="qqd-Ec-dRR" secondAttribute="bottom" id="dlq-Ml-QaB"/>
+                <constraint firstItem="Nbn-I0-Aq8" firstAttribute="top" secondItem="p88-3z-OHU" secondAttribute="bottom" id="iL9-cl-r1O"/>
                 <constraint firstItem="1Nx-rv-Gaa" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="k8P-OL-Job"/>
                 <constraint firstItem="19P-u5-hnX" firstAttribute="bottom" secondItem="6qn-ju-vAv" secondAttribute="top" id="nI3-ta-PuO"/>
                 <constraint firstItem="19P-u5-hnX" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="pFU-3M-kVC"/>
-                <constraint firstAttribute="bottom" secondItem="6qn-ju-vAv" secondAttribute="bottom" id="pex-yw-Mob"/>
+                <constraint firstItem="puy-fb-B7C" firstAttribute="bottom" secondItem="6qn-ju-vAv" secondAttribute="bottom" id="pex-yw-Mob"/>
                 <constraint firstAttribute="bottom" secondItem="19P-u5-hnX" secondAttribute="bottom" id="q8N-UI-NsK"/>
                 <constraint firstItem="1Nx-rv-Gaa" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="tXZ-N5-MNB"/>
                 <constraint firstItem="p88-3z-OHU" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="vFp-QP-ycO"/>
                 <constraint firstAttribute="bottom" secondItem="w6u-AL-wgB" secondAttribute="bottom" id="vjp-NT-c0n"/>
                 <constraint firstAttribute="bottom" secondItem="19P-u5-hnX" secondAttribute="bottom" id="wW6-C7-gGz"/>
+                <constraint firstItem="Nbn-I0-Aq8" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="xDh-mf-Bc3"/>
                 <constraint firstItem="6qn-ju-vAv" firstAttribute="top" secondItem="1Nx-rv-Gaa" secondAttribute="bottom" id="yNY-Sa-E8T"/>
             </constraints>
+            <viewLayoutGuide key="safeArea" id="puy-fb-B7C"/>
             <variation key="default">
                 <mask key="constraints">
-                    <exclude reference="WhB-Pt-vja"/>
                     <exclude reference="pFU-3M-kVC"/>
                     <exclude reference="q8N-UI-NsK"/>
                     <exclude reference="wW6-C7-gGz"/>
@@ -339,8 +351,8 @@ TAP HERE TO CHAT</string>
         </view>
     </objects>
     <resources>
-        <image name="call_inactive.png" width="90" height="90"/>
-        <image name="police_btn_icon_active.png" width="23" height="23"/>
-        <image name="police_btn_line_active.png" width="179" height="11"/>
+        <image name="call_inactive.png" width="60" height="60"/>
+        <image name="police_btn_icon_active.png" width="23.333333969116211" height="23.333333969116211"/>
+        <image name="police_btn_line_active.png" width="179.66667175292969" height="11"/>
     </resources>
 </document>

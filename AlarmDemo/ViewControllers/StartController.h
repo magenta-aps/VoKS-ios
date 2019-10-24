@@ -7,8 +7,12 @@
 
 #import <UIKit/UIKit.h>
 #import "Reachability.h"
+#import <MessageUI/MessageUI.h>
+#import "TermsViewController.h"
+#import "PhoneNumberViewController.h"
+#import "PhoneConfirmViewController.h"
 
-@interface StartController : UIViewController <NSURLConnectionDelegate, NSURLSessionDelegate>
+@interface StartController : UIViewController <NSURLConnectionDelegate, NSURLSessionDelegate, MFMailComposeViewControllerDelegate, TermsViewControllerDelegate, PhoneNumberViewControllerDelegate, PhoneConfirmViewControllerDelegate>
 
 // Connection info variable
 @property (nonatomic, retain) Reachability *connectionInfo;
@@ -26,6 +30,9 @@
 // Other views
 @property (weak, nonatomic) IBOutlet UIView *permissionsPopupView;
 @property (weak, nonatomic) IBOutlet UILabel *lNetworkError;
+@property (weak, nonatomic) IBOutlet UIView *sideMenuView;
+
+@property (assign, nonatomic) int failCount;
 
 
 // Button events
@@ -36,6 +43,11 @@
 - (IBAction)onPermissionsContinueClick:(id)sender;
 - (IBAction)onPermissionsContinueCancel:(id)sender;
 - (IBAction)onPermissionsContinueHold:(id)sender;
+
+- (IBAction)onTermsAndConditionsClick:(UIButton *)sender;
+- (IBAction)onPhoneNumberClick:(UIButton *)sender;
+- (IBAction)onMenuCloseClick:(UIButton *)sender;
+- (IBAction)onMenuClick:(UIButton *)sender;
 
 // Register device response data
 @property (nonatomic, retain) NSMutableData *responseData;
@@ -52,7 +64,17 @@
 @property (weak, nonatomic) IBOutlet UILabel *onlyOnceLabel;
 @property (weak, nonatomic) IBOutlet UIButton *continueButtonn;
 @property (weak, nonatomic) IBOutlet UILabel *loadingLabel;
+@property (weak, nonatomic) IBOutlet UIButton *menuCloseButton;
+@property (weak, nonatomic) IBOutlet UIButton *menuButton;
+@property (weak, nonatomic) IBOutlet UIButton *termsAndCondidtionsButton;
+@property (weak, nonatomic) IBOutlet UIButton *phoneNumberButton;
 
 
+@property (weak, nonatomic) IBOutlet UILabel *debug1Label;
+@property (weak, nonatomic) IBOutlet UILabel *debug2Label;
+@property (weak, nonatomic) IBOutlet UILabel *debug3Label;
 
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *sideMenuLeadingConstraint;
+
+@property (assign, nonatomic) BOOL initializedView;
 @end

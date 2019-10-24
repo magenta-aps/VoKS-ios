@@ -1240,7 +1240,9 @@ didRemoveIceCandidates:(NSArray<RTCIceCandidate *> *)candidates {
   if (!_isPeerConnectionCreating && !_isPeerConnectionPendingToClose &&
       _peerConnection) {
     _isPeerConnectionPendingToClose = YES;
+      if (_localMediaStream != nil) {
     [_peerConnection removeStream:_localMediaStream];
+      }
     [_peerConnection close];
     _peerConnection = nil;
     _isPeerConnectionPendingToClose = NO;

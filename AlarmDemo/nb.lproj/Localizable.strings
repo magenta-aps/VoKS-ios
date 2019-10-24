@@ -45,3 +45,31 @@
 "audio_connection_lost" = "Mistet lydforbindelsen";
 "audio_connection_recreated" = "Lydforbindelsen gjenopprettet";
 "got_it_button" = "Skjønner!";
+
+// New 2019-07
+"tac_not_accepted" = "For at du skal kunne benytte systemet, må du akseptere brukervilkårene";
+"tac_decline" = "AVVIS";
+"tac_accept" = "AKSEPTER";
+"menu_tac" = "Brukervilkår";
+"menu_phone" = "Mobilnummer";
+"phone_not_entered" = "Varsling pr sms er kun mulig ved å legge inn ditt mobilnummer";
+"phone_not_confirmed" = "Varsling pr sms er kun mulig etter at ditt mobilnummer er verifisert";
+"phone_explanation" = "Ønsker du å motta varsler om alvorlige hendelser pr sms, så legg inn ditt mobilnummer her:";
+"phone_delete" = "SLETT";
+"phone_skip" = "HOPP OVER";
+"phone_submit" = "SEND";
+"phone_hint" = "Mobilnummeret";
+"error_phone_empty" = "Vennligst legg inn ditt mobilnummer";
+"phone_confirm_explanation" = "Du vil motta en tekstmelding med en kode. Vennligst skriv koden inn her:";
+"phone_confirm_hint" = "Kode";
+"phone_confirm_cancel" = "AVBRYT";
+"phone_confirm_submit" = "SEND";
+"error_phone_token_empty" = "Vennligst legg inn den mottatte koden";
+"delete_phone_dialog_title" = "Slett mobilnummeret";
+"delete_phone_dialog_message" = "Er du sikker på at du vil slette mobilnummeret?";
+"delete_phone_dialog_confirm" = "BEKREFT";
+"delete_phone_dialog_cancel" = "AVBRYT";
+
+"send_code_again" = "Send ny kode";
+"code_resent" = "Koden er sendt deg på nytt";
+"phone_description" = "Mobilnummeret ditt blir kun lagret i BComeSafe-systemet og blir kun brukt for å sende deg varsler om alvorlige hendelser ved din skole. Du kan når som helst gå tilbake hit og slette nummeret. Du vil da ikke motta varsler pr. sms, men du vil få vanlige push-notifikasjoner. i appen. Leveringstiden på disse er imidlertid noe variabel, slik at det tryggeste er å benytte sms.";

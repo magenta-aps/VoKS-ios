@@ -12,7 +12,10 @@
 extern NSString *kBaseRegistrationURL;
 extern NSString *kBaseRegistrationDomain;
 extern NSString *kDefaultLoggerURL;
+extern NSString *kDefaultSheltersUrlEnd;
 
 + (void)setDeviceUID:(NSString *)deviceUID;
 + (NSString *)deviceUID;
++ (NSString*)createCheckUrl:(NSString*) url;
++ (NSString *)language;
 @end

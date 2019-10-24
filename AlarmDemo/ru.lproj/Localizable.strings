@@ -1,8 +1,8 @@
 //Start Alarm View
-"tap_here_cancel" = "TAP HERE TO CANCEL";
-"alarm_title" = "ALARM";
+"tap_here_cancel" =  "КОСНИТЕСЬ ЗДЕСЬ, ЧТОБЫ ОТМЕНИТЬ";
+"alarm_title" = "СИГНАЛ ТРЕВОГИ";
 "check_connection" = "Please, check if you are connected to Aruba Wi-Fi";
-"loading_please_wait" = "Loading,\nplease wait";
+"loading_please_wait" = "Загрузка,\nподождите";
 
 // Register view
 "register_title" = "Thank you for installing";
@@ -20,32 +20,32 @@
 "button_continue" = "Continue";
 
 // Alarm Active View
-"button_call_police" = "Call Police";
-"button_hide" = "Hide";
-"alarm_is_active" = "ALARM IS\nACTIVE";
-"hide_or_call" = "Hide app or call the police";
-"tap_to_see" = "Tap to see chat";
-"tap_to_chat" = "Can you tell us something about the situation?\nTap here to chat";
-"tap_to_hide" = "TAP HERE TO HIDE";
-"button_send" = "Send";
-"type_message" = "Type message";
+"button_call_police" = "Позвонить в полицию";
+"button_hide" = "Скрыть";
+"alarm_is_active" = "СИГНАЛ ТРЕВОГИ\nРАБОТАЕТ";
+"hide_or_call" = "Скройте приложение или позвоните в полицию";
+"tap_to_see" = "Коснитесь, чтобы увидеть чат";
+"tap_to_chat" = "Можете ли Вы рассказать нам что-нибудь о ситуации?\nКоснитесь здесь, чтобы пообщаться в чате";
+"tap_to_hide" = "КОСНИТЕСЬ ЗДЕСЬ, ЧТОБЫ СКРЫТЬ";
+"button_send" = "Отправить";
+"type_message" = "Введите сообщение";
 
 
 // Chat messages
-"connecting_to_shelter" = "Connecting to shelter";
-"connected_to_shelter" = "Connected to shelter";
-"connection_lost" = "Connection lost. Waiting...";
+"connecting_to_shelter" = "Подключение центру управления";
+"connected_to_shelter" = "Подключен к центру управления";
+"connection_lost" = "Соединение прервано. Ожидание...;";
 "unable_to_connect" = "Unable to connect. Waiting...";
-"calling_crisis_team" = "Calling Crisis Center. Waiting for answer...";
-"call_crisis_team_ended" = "Call with crisis Center ended";
-"crisis_team_answered" = "Crisis Center answered";
-"crisis_team_resumed" = "Crisis Center resumed call";
-"crisis_team_hold" = "Crisis Center hold call";
-"check_internet_connection" = "Please, check if you are connected to Aruba Wi-Fi";
-"crisis_team_chat" = "Crisis Center:\n";
-"audio_connection_lost" = "Audio connection lost";
+"calling_crisis_team" = "Вызов центра управления. Ожидание ответа...";
+"call_crisis_team_ended" = "Звонок в центр управлени завершен";
+"crisis_team_answered" = "Центр управления ответил";
+"crisis_team_resumed" = "Центр управления возобновил вызов";
+"crisis_team_hold" = "Центр управления удерживает вызов";
+"check_internet_connection" = "Проверьте, подключены ли Вы к беспроводной сети Aruba";
+"crisis_team_chat" = "Центр управления:\n";
+"audio_connection_lost" = "Аудио соединение прервано";
 "audio_connection_recreated" = "Audio connection recreated";
-"got_it_button" = "GOT IT!";
+"got_it_button" = "ЯСНО!";
 
 // New 2019-07
 "tac_not_accepted" = "Functions are only available upon accepting the Terms and Conditions";
@@ -56,7 +56,6 @@
 "phone_not_entered" = "Functions are only available after entering phone number";
 "phone_not_confirmed" = "Functions are only available after phone number confirmation";
 "phone_explanation" = "Please enter phone number below if you want to receive SMS messages from BComeSafe";
-"phone_explanation_description" = "";
 "phone_delete" = "DELETE";
 "phone_skip" = "SKIP";
 "phone_submit" = "SUBMIT";
@@ -71,7 +70,3 @@
 "delete_phone_dialog_message" = "Are you sure you want to delete phone number?";
 "delete_phone_dialog_confirm" = "CONFIRM";
 "delete_phone_dialog_cancel" = "CANCEL";
-
-"send_code_again" = "Send Code again";
-"code_resent" = "Code resent";
-"phone_description" = "Your mobile number is only stored in the BComeSafe system and is only used to send you notifications of serious incidents at your school. You can go back here at any time and delete the number. You will not receive notifications per sms, but you will get regular push notifications in the app. However, their delivery time is somewhat variable, so the safest is to use SMS.";

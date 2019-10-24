@@ -860,8 +860,13 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
       logClass:NSStringFromClass([self class])
        message:[NSString stringWithFormat:@"onCallPoliceClicked"]];
   [self sendTriggerAlarmRequest:YES];
-  NSString *phoneNumber = [@"tel://" stringByAppendingString:@"+4799285850"];
-  [[UIApplication sharedApplication] openURL:[NSURL URLWithString:phoneNumber]];
+    
+    NSString *policeNumber = [[NSUserDefaults standardUserDefaults] stringForKey:@"police_number"];
+    
+    if (policeNumber) {
+        NSString *phoneNumber = [@"tel://" stringByAppendingString:policeNumber];
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:phoneNumber]];
+    }
 }
 
 - (IBAction)onHideClicked:(id)sender {
@@ -1392,8 +1397,8 @@ completion:^(BOOL finished){
                                                 calledPolice,
                                                 error.description]];
         [self performSelector:@selector(sendTriggerAlarmRequest:)
-                   withObject:calledPolice ? (id)kCFBooleanTrue
-                                           : (id)kCFBooleanFalse
+                   withObject:calledPolice ? @YES
+                                           : @NO
                    afterDelay:3];
       }];
 }
@@ -1404,9 +1409,10 @@ completion:^(BOOL finished){
                        failureBlock:(void (^)(NSError *error))failureBlock {
 
     NSURLSessionConfiguration *defaultConfigObject = [NSURLSessionConfiguration defaultSessionConfiguration];
+    defaultConfigObject.timeoutIntervalForRequest = 5;
+    defaultConfigObject.timeoutIntervalForResource = 10;
     NSURLSession *defaultSession = [NSURLSession sessionWithConfiguration: defaultConfigObject delegate: self delegateQueue: [NSOperationQueue mainQueue]];
-    defaultSession.configuration.timeoutIntervalForRequest = 5;
-    defaultSession.configuration.timeoutIntervalForResource = 10;
+    
   [[defaultSession
         dataTaskWithURL:
             [NSURL URLWithString:

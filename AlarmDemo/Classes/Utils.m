@@ -12,9 +12,11 @@
 
 @implementation Utils
 
-NSString *kBaseRegistrationURL = @"https://voks.afk.no";
-NSString *kBaseRegistrationDomain = @"voks.afk.no";
-NSString *kDefaultLoggerURL = @"https://voks.afk.no/api/device/logger";
+NSString *kBaseRegistrationURL = @"https://api.bcomesafe.com";
+NSString *kBaseRegistrationDomain = @"api.bcomesafe.com";
+NSString *kDefaultLoggerURL = @"https://api.bcomesafe.com/api/device/logger";
+NSString *kDefaultCheckURLEnd = @"/check_connection/check.txt";
+NSString *kDefaultSheltersUrlEnd = @"bcs/list";
 
 + (void)setDeviceUID:(NSString *)deviceUID {
   KeychainItemWrapper *keychainItem =
@@ -39,13 +41,40 @@ NSString *kDefaultLoggerURL = @"https://voks.afk.no/api/device/logger";
                                           accessGroup:nil];
   NSString *uid = [keychainItem objectForKey:(__bridge id)(kSecValueData)];
   if (uid != nil && [uid length] > 0) {
-    return uid;
+    return [uid stringByAppendingString:@"_ios"];
   } else {
     NSString *new_uid =
         [[[UIDevice currentDevice] identifierForVendor] UUIDString];
     [self setDeviceUID:new_uid];
-    return new_uid;
+      return [new_uid stringByAppendingString:@"_ios"];
   }
+}
+
++ (NSString*)createCheckUrl:(NSString*) url {
+   @try {
+        NSString *scheme = @"";
+        if ([url rangeOfString:@"http://"].location != NSNotFound) {
+            scheme = @"http://";
+        } else if ([url rangeOfString:@"https://"].location != NSNotFound) {
+            scheme = @"https://";
+        } else {
+            scheme = @"http://";
+        }
+        
+        url = [[url stringByReplacingOccurrencesOfString:@"http://" withString:@""] stringByReplacingOccurrencesOfString:@"https://" withString:@""];
+       NSArray *parts = [url componentsSeparatedByString:@"/"];
+        url = parts[0];
+        NSString *combinedUrl = [[scheme stringByAppendingString:url] stringByAppendingString: kDefaultCheckURLEnd];
+        return combinedUrl;
+    } @catch (NSException *e) {
+        return @"";
+    }
+}
+
++ (NSString *)language {
+    NSString *language = [[NSLocale preferredLanguages] objectAtIndex:0];
+    NSDictionary *localizationDictionary = [NSLocale componentsFromLocaleIdentifier:language];
+    return [localizationDictionary objectForKey:NSLocaleLanguageCode];
 }
 
 @end

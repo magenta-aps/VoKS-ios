@@ -25,7 +25,7 @@
   if (self) {
     _logs = [NSMutableArray array];
     _queuedLogs = [NSMutableArray array];
-    _isEnabled = YES;
+    _isEnabled = NO;
     _doSendToRemote = NO;
   }
 

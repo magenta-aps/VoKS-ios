@@ -14,6 +14,11 @@
 		A73D56751AA9781400AE25FE /* Message.m in Sources */ = {isa = PBXBuildFile; fileRef = A73D56741AA9781400AE25FE /* Message.m */; };
 		A73D56791AA978DC00AE25FE /* MessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A73D56771AA978DC00AE25FE /* MessageCell.m */; };
 		A73D567A1AA978DC00AE25FE /* MessageCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A73D56781AA978DC00AE25FE /* MessageCell.xib */; };
+		A73FE61222EC8F5B0084413C /* PhoneNumberViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A73FE60F22EC8F5A0084413C /* PhoneNumberViewController.m */; };
+		A73FE61322EC8F5B0084413C /* PhoneNumberViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A73FE61122EC8F5B0084413C /* PhoneNumberViewController.xib */; };
+		A73FE61722EC98D60084413C /* PhoneConfirmViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A73FE61522EC98D60084413C /* PhoneConfirmViewController.m */; };
+		A73FE61822EC98D60084413C /* PhoneConfirmViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A73FE61622EC98D60084413C /* PhoneConfirmViewController.xib */; };
+		A73FE61B22ECA7010084413C /* ShelterAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = A73FE61A22ECA7010084413C /* ShelterAPI.m */; };
 		A74D088D1A9473B300B16DB9 /* StartController.m in Sources */ = {isa = PBXBuildFile; fileRef = A74D088B1A9473B300B16DB9 /* StartController.m */; };
 		A76C62C91AD68A7F004AE073 /* alarm_btn_active@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A76C62951AD68A7F004AE073 /* alarm_btn_active@2x.png */; };
 		A76C62CA1AD68A7F004AE073 /* alarm_btn_active@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = A76C62961AD68A7F004AE073 /* alarm_btn_active@3x.png */; };
@@ -90,6 +95,8 @@
 		A7DF512F1B8DE3F30083F602 /* NotificationMessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A7DF512D1B8DE3F30083F602 /* NotificationMessageCell.m */; };
 		A7DF51301B8DE3F30083F602 /* NotificationMessageCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7DF512E1B8DE3F30083F602 /* NotificationMessageCell.xib */; };
 		A7E69B411B79C05400152226 /* AppLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = A7E69B401B79C05400152226 /* AppLogger.m */; };
+		A7EA0C6D22F1ECD600D4C158 /* TermsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7EA0C6B22F1ECD600D4C158 /* TermsViewController.m */; };
+		A7EA0C6E22F1ECD600D4C158 /* TermsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7EA0C6C22F1ECD600D4C158 /* TermsViewController.xib */; };
 		A7F0495E1B1708AE0089C524 /* NotificationController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7F0495C1B1708AE0089C524 /* NotificationController.m */; };
 		A7F0495F1B1708AE0089C524 /* NotificationController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A7F0495D1B1708AE0089C524 /* NotificationController.xib */; };
 		A7F1ADFB1AA48C2C002A28B2 /* UIImage+ARDUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = A7F1ADFA1AA48C2C002A28B2 /* UIImage+ARDUtilities.m */; };
@@ -113,7 +120,6 @@
 		A7F707031E2D653800C9CABB /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A7F707021E2D653800C9CABB /* libc++.tbd */; };
 		A7F707051E2D654800C9CABB /* libicucore.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A7F707041E2D654800C9CABB /* libicucore.tbd */; };
 		A7F707061E2D655600C9CABB /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7AF31B11A9393BF00C4B33E /* CFNetwork.framework */; };
-		A7F707081E2D656500C9CABB /* libstdc++.6.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A7F707071E2D656500C9CABB /* libstdc++.6.tbd */; };
 		A7F707091E2D656E00C9CABB /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7AF31B71A9393DB00C4B33E /* AudioToolbox.framework */; };
 		A7F7070A1E2D657400C9CABB /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7AF31B91A9393E100C4B33E /* AVFoundation.framework */; };
 		A7F7070B1E2D657D00C9CABB /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7AF31BB1A9393E700C4B33E /* CoreAudio.framework */; };
@@ -155,6 +161,12 @@
 
 /* Begin PBXFileReference section */
 		A7042B091AD6AA0700EE686D /* splash_screen@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "splash_screen@2x.png"; sourceTree = "<group>"; };
+		A705E2D222F20DEC00B3DF71 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Main.strings; sourceTree = "<group>"; };
+		A705E2D322F20DEC00B3DF71 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		A705E2D422F20DEC00B3DF71 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A705E2D522F20E1B00B3DF71 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Main.strings; sourceTree = "<group>"; };
+		A705E2D622F20E1B00B3DF71 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		A705E2D722F20E1B00B3DF71 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A72536AF1AA0A3BC003B77F2 /* AlarmController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlarmController.h; sourceTree = "<group>"; };
 		A72536B01AA0A3BC003B77F2 /* AlarmController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlarmController.m; sourceTree = "<group>"; };
 		A73D56731AA9781400AE25FE /* Message.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Message.h; sourceTree = "<group>"; };
@@ -162,6 +174,14 @@
 		A73D56761AA978DC00AE25FE /* MessageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageCell.h; sourceTree = "<group>"; };
 		A73D56771AA978DC00AE25FE /* MessageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageCell.m; sourceTree = "<group>"; };
 		A73D56781AA978DC00AE25FE /* MessageCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MessageCell.xib; sourceTree = "<group>"; };
+		A73FE60F22EC8F5A0084413C /* PhoneNumberViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhoneNumberViewController.m; sourceTree = "<group>"; };
+		A73FE61022EC8F5B0084413C /* PhoneNumberViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhoneNumberViewController.h; sourceTree = "<group>"; };
+		A73FE61122EC8F5B0084413C /* PhoneNumberViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PhoneNumberViewController.xib; sourceTree = "<group>"; };
+		A73FE61422EC98D60084413C /* PhoneConfirmViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PhoneConfirmViewController.h; path = ../../../../../../../../../System/Volumes/Data/Users/azibas/Documents/Projects/IV/Planciunas/bcomesafe_ios/AlarmDemo/ViewControllers/PhoneConfirmViewController.h; sourceTree = "<group>"; };
+		A73FE61522EC98D60084413C /* PhoneConfirmViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PhoneConfirmViewController.m; path = ../../../../../../../../../System/Volumes/Data/Users/azibas/Documents/Projects/IV/Planciunas/bcomesafe_ios/AlarmDemo/ViewControllers/PhoneConfirmViewController.m; sourceTree = "<group>"; };
+		A73FE61622EC98D60084413C /* PhoneConfirmViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = PhoneConfirmViewController.xib; path = ../../../../../../../../../System/Volumes/Data/Users/azibas/Documents/Projects/IV/Planciunas/bcomesafe_ios/AlarmDemo/ViewControllers/PhoneConfirmViewController.xib; sourceTree = "<group>"; };
+		A73FE61922ECA7010084413C /* ShelterAPI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ShelterAPI.h; path = ../../../../../../../../../System/Volumes/Data/Users/azibas/Documents/Projects/IV/Planciunas/bcomesafe_ios/AlarmDemo/Classes/ShelterAPI.h; sourceTree = "<group>"; };
+		A73FE61A22ECA7010084413C /* ShelterAPI.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ShelterAPI.m; path = ../../../../../../../../../System/Volumes/Data/Users/azibas/Documents/Projects/IV/Planciunas/bcomesafe_ios/AlarmDemo/Classes/ShelterAPI.m; sourceTree = "<group>"; };
 		A74D088A1A9473B300B16DB9 /* StartController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StartController.h; sourceTree = "<group>"; };
 		A74D088B1A9473B300B16DB9 /* StartController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StartController.m; sourceTree = "<group>"; };
 		A76C62951AD68A7F004AE073 /* alarm_btn_active@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "alarm_btn_active@2x.png"; sourceTree = "<group>"; };
@@ -216,9 +236,10 @@
 		A76C62C61AD68A7F004AE073 /* police_btn_line_inactive@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "police_btn_line_inactive@3x.png"; sourceTree = "<group>"; };
 		A76C62C71AD68A7F004AE073 /* police_btn_line_press@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "police_btn_line_press@2x.png"; sourceTree = "<group>"; };
 		A76C62C81AD68A7F004AE073 /* police_btn_line_press@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "police_btn_line_press@3x.png"; sourceTree = "<group>"; };
+		A78F68A71F61CA3E00244F0D /* AlarmDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AlarmDemo.entitlements; sourceTree = "<group>"; };
 		A7AD113C1ACD44D9004AA01A /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		A7AD113D1ACD44D9004AA01A /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
-		A7AF31321A9391D900C4B33E /* AlarmDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AlarmDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A7AF31321A9391D900C4B33E /* BComeSafe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BComeSafe.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7AF31361A9391D900C4B33E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A7AF31371A9391D900C4B33E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		A7AF31391A9391D900C4B33E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -330,6 +351,9 @@
 		A7E1AA571B70FD93000D409F /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = System/Library/Frameworks/VideoToolbox.framework; sourceTree = SDKROOT; };
 		A7E69B3F1B79C05400152226 /* AppLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppLogger.h; sourceTree = "<group>"; };
 		A7E69B401B79C05400152226 /* AppLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppLogger.m; sourceTree = "<group>"; };
+		A7EA0C6A22F1ECD600D4C158 /* TermsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TermsViewController.h; sourceTree = "<group>"; };
+		A7EA0C6B22F1ECD600D4C158 /* TermsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TermsViewController.m; sourceTree = "<group>"; };
+		A7EA0C6C22F1ECD600D4C158 /* TermsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TermsViewController.xib; sourceTree = "<group>"; };
 		A7F0495B1B1708AE0089C524 /* NotificationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationController.h; sourceTree = "<group>"; };
 		A7F0495C1B1708AE0089C524 /* NotificationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationController.m; sourceTree = "<group>"; };
 		A7F0495D1B1708AE0089C524 /* NotificationController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = NotificationController.xib; path = ../ViewControllers/NotificationController.xib; sourceTree = "<group>"; };
@@ -404,7 +428,6 @@
 				A7F7070B1E2D657D00C9CABB /* CoreAudio.framework in Frameworks */,
 				A7F7070A1E2D657400C9CABB /* AVFoundation.framework in Frameworks */,
 				A7F707091E2D656E00C9CABB /* AudioToolbox.framework in Frameworks */,
-				A7F707081E2D656500C9CABB /* libstdc++.6.tbd in Frameworks */,
 				A7F707061E2D655600C9CABB /* CFNetwork.framework in Frameworks */,
 				A7F707051E2D654800C9CABB /* libicucore.tbd in Frameworks */,
 				A7F707031E2D653800C9CABB /* libc++.tbd in Frameworks */,
@@ -441,6 +464,8 @@
 				A7FFCFDE1B13044000D26908 /* Utils.m */,
 				A7E69B3F1B79C05400152226 /* AppLogger.h */,
 				A7E69B401B79C05400152226 /* AppLogger.m */,
+				A73FE61922ECA7010084413C /* ShelterAPI.h */,
+				A73FE61A22ECA7010084413C /* ShelterAPI.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -456,6 +481,15 @@
 				A72536B01AA0A3BC003B77F2 /* AlarmController.m */,
 				A7F0495B1B1708AE0089C524 /* NotificationController.h */,
 				A7F0495C1B1708AE0089C524 /* NotificationController.m */,
+				A73FE61022EC8F5B0084413C /* PhoneNumberViewController.h */,
+				A73FE60F22EC8F5A0084413C /* PhoneNumberViewController.m */,
+				A73FE61122EC8F5B0084413C /* PhoneNumberViewController.xib */,
+				A73FE61422EC98D60084413C /* PhoneConfirmViewController.h */,
+				A73FE61522EC98D60084413C /* PhoneConfirmViewController.m */,
+				A73FE61622EC98D60084413C /* PhoneConfirmViewController.xib */,
+				A7EA0C6A22F1ECD600D4C158 /* TermsViewController.h */,
+				A7EA0C6B22F1ECD600D4C158 /* TermsViewController.m */,
+				A7EA0C6C22F1ECD600D4C158 /* TermsViewController.xib */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -567,7 +601,7 @@
 		A7AF31331A9391D900C4B33E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A7AF31321A9391D900C4B33E /* AlarmDemo.app */,
+				A7AF31321A9391D900C4B33E /* BComeSafe.app */,
 				A7AF314B1A9391D900C4B33E /* AlarmDemoTests.xctest */,
 			);
 			name = Products;
@@ -576,6 +610,7 @@
 		A7AF31341A9391D900C4B33E /* AlarmDemo */ = {
 			isa = PBXGroup;
 			children = (
+				A78F68A71F61CA3E00244F0D /* AlarmDemo.entitlements */,
 				A74D08821A94707E00B16DB9 /* Classes */,
 				A74D08831A94707E00B16DB9 /* ViewControllers */,
 				A74D08841A94707E00B16DB9 /* Views */,
@@ -786,9 +821,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A7AF31311A9391D900C4B33E /* AlarmDemo */ = {
+		A7AF31311A9391D900C4B33E /* BComeSafe */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A7AF31551A9391D900C4B33E /* Build configuration list for PBXNativeTarget "AlarmDemo" */;
+			buildConfigurationList = A7AF31551A9391D900C4B33E /* Build configuration list for PBXNativeTarget "BComeSafe" */;
 			buildPhases = (
 				A7AF312E1A9391D900C4B33E /* Sources */,
 				A7AF312F1A9391D900C4B33E /* Frameworks */,
@@ -799,9 +834,9 @@
 			);
 			dependencies = (
 			);
-			name = AlarmDemo;
+			name = BComeSafe;
 			productName = AlarmDemo;
-			productReference = A7AF31321A9391D900C4B33E /* AlarmDemo.app */;
+			productReference = A7AF31321A9391D900C4B33E /* BComeSafe.app */;
 			productType = "com.apple.product-type.application";
 		};
 		A7AF314A1A9391D900C4B33E /* AlarmDemoTests */ = {
@@ -829,11 +864,16 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0610;
-				ORGANIZATIONNAME = "BComeSafe";
+				ORGANIZATIONNAME = "Baltic Amadeus";
 				TargetAttributes = {
 					A7AF31311A9391D900C4B33E = {
 						CreatedOnToolsVersion = 6.1.1;
-						DevelopmentTeam = DX47P89GRB;
+						DevelopmentTeam = 7A7D6JL32N;
+						SystemCapabilities = {
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
 					};
 					A7AF314A1A9391D900C4B33E = {
 						CreatedOnToolsVersion = 6.1.1;
@@ -846,16 +886,19 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 				nb,
+				ru,
+				uk,
 			);
 			mainGroup = A7AF31291A9391D900C4B33E;
 			productRefGroup = A7AF31331A9391D900C4B33E /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A7AF31311A9391D900C4B33E /* AlarmDemo */,
+				A7AF31311A9391D900C4B33E /* BComeSafe */,
 				A7AF314A1A9391D900C4B33E /* AlarmDemoTests */,
 			);
 		};
@@ -900,6 +943,7 @@
 				A7DAF25D1B6765BB0023B310 /* AlarmController.xib in Resources */,
 				A76C62EC1AD68A7F004AE073 /* Icon-Small@2x.png in Resources */,
 				A76C62CB1AD68A7F004AE073 /* alarm_btn_inactive@2x.png in Resources */,
+				A7EA0C6E22F1ECD600D4C158 /* TermsViewController.xib in Resources */,
 				A76C62E41AD68A7F004AE073 /* Icon-76.png in Resources */,
 				A76C62DC1AD68A7F004AE073 /* drop_inactive@3x.png in Resources */,
 				A7042B0A1AD6AA0700EE686D /* splash_screen@2x.png in Resources */,
@@ -909,6 +953,7 @@
 				A7C8284A1B1D976000646F02 /* UserMessageCell.xib in Resources */,
 				A76C62E81AD68A7F004AE073 /* Icon-Small-40@3x.png in Resources */,
 				A76C62FC1AD68A7F004AE073 /* police_btn_line_press@3x.png in Resources */,
+				A73FE61322EC8F5B0084413C /* PhoneNumberViewController.xib in Resources */,
 				A7C828451B1D95A200646F02 /* SystemMessageCell.xib in Resources */,
 				A76C62FA1AD68A7F004AE073 /* police_btn_line_inactive@3x.png in Resources */,
 				A76C62E11AD68A7F004AE073 /* Icon-60@3x.png in Resources */,
@@ -923,6 +968,7 @@
 				A76C62CC1AD68A7F004AE073 /* alarm_btn_inactive@3x.png in Resources */,
 				A76C62CA1AD68A7F004AE073 /* alarm_btn_active@3x.png in Resources */,
 				A7DAF25B1B6765B20023B310 /* StartController.xib in Resources */,
+				A73FE61822EC98D60084413C /* PhoneConfirmViewController.xib in Resources */,
 				A7AF31431A9391D900C4B33E /* Images.xcassets in Resources */,
 				A76C62D61AD68A7F004AE073 /* chat_left@3x.png in Resources */,
 				A76C62CF1AD68A7F004AE073 /* call_active@2x.png in Resources */,
@@ -953,17 +999,20 @@
 				A7AF31A71A93934800C4B33E /* SRWebSocket.m in Sources */,
 				A7FFCFE51B1304F700D26908 /* KeychainItemWrapper.m in Sources */,
 				A7AF319A1A93934800C4B33E /* ARDAppClient.m in Sources */,
+				A73FE61222EC8F5B0084413C /* PhoneNumberViewController.m in Sources */,
 				A7F4F1841E5628CC0039A53B /* ARDUtilities.m in Sources */,
 				A7F4F16E1E5627C70039A53B /* ARDAppEngineClient.m in Sources */,
 				A7F4F1751E5627C70039A53B /* ARDTURNClient.m in Sources */,
 				A7C828441B1D95A200646F02 /* SystemMessageCell.m in Sources */,
 				A7F4F1771E5627C70039A53B /* RTCIceCandidate+JSON.m in Sources */,
+				A7EA0C6D22F1ECD600D4C158 /* TermsViewController.m in Sources */,
 				A73D56751AA9781400AE25FE /* Message.m in Sources */,
 				A7E69B411B79C05400152226 /* AppLogger.m in Sources */,
 				A7C828491B1D976000646F02 /* UserMessageCell.m in Sources */,
 				A7F1ADFB1AA48C2C002A28B2 /* UIImage+ARDUtilities.m in Sources */,
 				A7F4F1731E5627C70039A53B /* ARDSignalingMessage.m in Sources */,
 				A7F4F1711E5627C70039A53B /* ARDMessageResponse.m in Sources */,
+				A73FE61B22ECA7010084413C /* ShelterAPI.m in Sources */,
 				A7F4F1761E5627C70039A53B /* ARDWebSocketChannel.m in Sources */,
 				A7F0495E1B1708AE0089C524 /* NotificationController.m in Sources */,
 				A7F4F1781E5627C70039A53B /* RTCIceServer+JSON.m in Sources */,
@@ -974,6 +1023,7 @@
 				A7F4F1721E5627C70039A53B /* ARDSDPUtils.m in Sources */,
 				A7F4F17D1E56281E0039A53B /* ARDSettingsModel.m in Sources */,
 				A74D088D1A9473B300B16DB9 /* StartController.m in Sources */,
+				A73FE61722EC98D60084413C /* PhoneConfirmViewController.m in Sources */,
 				A7AF31381A9391D900C4B33E /* main.m in Sources */,
 				A7F4F1741E5627C70039A53B /* ARDStatsBuilder.m in Sources */,
 				A73D56791AA978DC00AE25FE /* MessageCell.m in Sources */,
@@ -1003,7 +1053,7 @@
 /* Begin PBXTargetDependency section */
 		A7AF314D1A9391D900C4B33E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = A7AF31311A9391D900C4B33E /* AlarmDemo */;
+			target = A7AF31311A9391D900C4B33E /* BComeSafe */;
 			targetProxy = A7AF314C1A9391D900C4B33E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -1014,6 +1064,8 @@
 			children = (
 				A7AF31401A9391D900C4B33E /* Base */,
 				A7F618D61B610C27005047CF /* nb */,
+				A705E2D222F20DEC00B3DF71 /* ru */,
+				A705E2D522F20E1B00B3DF71 /* uk */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -1023,6 +1075,8 @@
 			children = (
 				A7AF31451A9391D900C4B33E /* Base */,
 				A7F618D71B610C27005047CF /* nb */,
+				A705E2D322F20DEC00B3DF71 /* ru */,
+				A705E2D622F20E1B00B3DF71 /* uk */,
 			);
 			name = LaunchScreen.xib;
 			sourceTree = "<group>";
@@ -1032,6 +1086,8 @@
 			children = (
 				A7FB85321ADB928700813C6F /* Base */,
 				A7F618D81B610C27005047CF /* nb */,
+				A705E2D422F20DEC00B3DF71 /* ru */,
+				A705E2D722F20E1B00B3DF71 /* uk */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1120,9 +1176,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_ENTITLEMENTS = AlarmDemo/AlarmDemo.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = DX47P89GRB;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = 7A7D6JL32N;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1130,14 +1188,15 @@
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				INFOPLIST_FILE = AlarmDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/AlarmDemo",
 					"$(PROJECT_DIR)/AlarmDemo/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.bcomesafe.app;
+				MARKETING_VERSION = 1.2.8;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bcomesafe.bcomesafeapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 			};
@@ -1148,9 +1207,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_ENTITLEMENTS = AlarmDemo/AlarmDemo.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = DX47P89GRB;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = 7A7D6JL32N;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1158,15 +1219,16 @@
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				INFOPLIST_FILE = AlarmDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/AlarmDemo",
 					"$(PROJECT_DIR)/AlarmDemo/Frameworks",
 				);
+				MARKETING_VERSION = 1.2.8;
 				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = com.bcomesafe.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bcomesafe.bcomesafeapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 			};
@@ -1218,7 +1280,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A7AF31551A9391D900C4B33E /* Build configuration list for PBXNativeTarget "AlarmDemo" */ = {
+		A7AF31551A9391D900C4B33E /* Build configuration list for PBXNativeTarget "BComeSafe" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A7AF31561A9391D900C4B33E /* Debug */,

@@ -504,6 +504,7 @@
             categories:categories];
   [[UIApplication sharedApplication]
       registerUserNotificationSettings:notificationSettings];
+//    [[UIApplication sharedApplication] registerForRemoteNotifications];
 }
 
 - (void)scheduleNotificationWithItem:(Message *)msg {
