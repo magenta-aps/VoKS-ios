@@ -201,7 +201,7 @@ static int const kKbpsMultiplier = 1000;
   _iceServers = [NSMutableArray array];
   _shelterState = kShelterStateDisconnected;
   _roomId = [[NSUserDefaults standardUserDefaults] stringForKey:@"shelter_id"];
-  _clientId = [[Utils deviceUID] stringByAppendingString:@"_ios"];
+  _clientId = [Utils deviceUID];
 
   _websocketURL = [NSURL URLWithString:[[NSUserDefaults standardUserDefaults]
                                            stringForKey:@"ws_url"]];

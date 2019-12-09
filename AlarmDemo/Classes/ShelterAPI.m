@@ -7,7 +7,7 @@
     NSURL *url = [NSURL URLWithString:
                   [NSString
                    stringWithFormat:
-                   @"%@/api/voks/"
+                   @"%@/api/device/"
                    @"update-device",
                    [[NSUserDefaults standardUserDefaults] stringForKey:@"shelter_url"]]];
 

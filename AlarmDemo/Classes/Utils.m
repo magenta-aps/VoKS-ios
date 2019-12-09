@@ -65,6 +65,8 @@ NSString *kDefaultSheltersUrlEnd = @"bcs/list";
        NSArray *parts = [url componentsSeparatedByString:@"/"];
         url = parts[0];
         NSString *combinedUrl = [[scheme stringByAppendingString:url] stringByAppendingString: kDefaultCheckURLEnd];
+        int milliseconds = (int)([[NSDate date] timeIntervalSince1970] * 1000);
+        combinedUrl = [combinedUrl stringByAppendingFormat:@"?_=%i", milliseconds];
         return combinedUrl;
     } @catch (NSException *e) {
         return @"";
