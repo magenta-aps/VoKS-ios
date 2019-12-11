@@ -299,14 +299,7 @@
 - (void)application:(UIApplication *)application
     didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
     NSLog(@"%@",[NSString stringWithFormat:@"%@",deviceToken]);
-  NSString *deviceStringToken =
-      [[[[NSString stringWithFormat:@"%@", deviceToken]
-          stringByReplacingOccurrencesOfString:@"<"
-                                    withString:@""]
-          stringByReplacingOccurrencesOfString:@" "
-                                    withString:@""]
-          stringByReplacingOccurrencesOfString:@">"
-                                    withString:@""];
+    NSString *deviceStringToken = [AppDelegate hexadecimalStringFromData: deviceToken];
 
   [[AppLogger sharedInstance]
       logClass:NSStringFromClass([self class])
@@ -581,6 +574,21 @@
 
     completionHandler(UIBackgroundFetchResultNoData);
   }
+}
+
++ (NSString *)hexadecimalStringFromData:(NSData *)data
+{
+  NSUInteger dataLength = data.length;
+  if (dataLength == 0) {
+    return nil;
+  }
+
+  const unsigned char *dataBuffer = (const unsigned char *)data.bytes;
+  NSMutableString *hexString  = [NSMutableString stringWithCapacity:(dataLength * 2)];
+  for (int i = 0; i < dataLength; ++i) {
+    [hexString appendFormat:@"%02x", dataBuffer[i]];
+  }
+  return [hexString copy];
 }
 
 //- (void) application:(UIApplication *)application

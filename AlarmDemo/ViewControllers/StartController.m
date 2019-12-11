@@ -464,7 +464,7 @@ message:[NSString
                 [NSURL URLWithString:
                            [NSString
                                stringWithFormat:
-                                   @"%@/api/voks/"
+                                   @"%@/api/device/"
                                    @"register-device?device_type=ios&device_"
                                    @"id=%@&gcm_id=%@&lang=%@",
                                    [[NSUserDefaults standardUserDefaults] stringForKey:@"shelter_url"], [Utils deviceUID],
@@ -521,20 +521,21 @@ message:[NSString
     defaultConfigObject.timeoutIntervalForRequest = 5;
     defaultConfigObject.timeoutIntervalForResource = 10;
     NSURLSession *defaultSession = [NSURLSession sessionWithConfiguration: defaultConfigObject delegate: self delegateQueue: [NSOperationQueue mainQueue]];
-    
+
+
+    NSString *urlString = [NSString stringWithFormat:
+        @"%@/api/device/"
+        @"register-device?device_type=ios&device_"
+        @"id=%@&gcm_id=%@&mac_address=%@&shelter_id=%@&lang=%@",
+        [[NSUserDefaults standardUserDefaults] stringForKey:@"shelter_url"], [Utils deviceUID],
+        [[NSUserDefaults standardUserDefaults]
+            stringForKey:@"APNS_ID"]
+            ? [[NSUserDefaults standardUserDefaults]
+                  stringForKey:@"APNS_ID"]
+                                                    : @"", @"00:00:00:00:00", [[NSUserDefaults standardUserDefaults] stringForKey:@"shelter_id"], [Utils language]];
     [[defaultSession dataTaskWithURL:
                 [NSURL URLWithString:
-                           [NSString
-                               stringWithFormat:
-                                   @"%@/api/voks/"
-                                   @"register-device?device_type=ios&device_"
-                                   @"id=%@&gcm_id=%@&mac_address=%@&shelter_id=%@&lang=%@",
-                                   [[NSUserDefaults standardUserDefaults] stringForKey:@"shelter_url"], [Utils deviceUID],
-                                   [[NSUserDefaults standardUserDefaults]
-                                       stringForKey:@"APNS_ID"]
-                                       ? [[NSUserDefaults standardUserDefaults]
-                                             stringForKey:@"APNS_ID"]
-                                       : @"", @"00:00:00:00:00", [[NSUserDefaults standardUserDefaults] stringForKey:@"shelter_id"], [Utils language]]]
+                           urlString]
           completionHandler:^(NSData *data, NSURLResponse *response,
                               NSError *errorRequest) {
             // handle response
@@ -583,6 +584,9 @@ message:[NSString
         [[NSUserDefaults standardUserDefaults]
          setBool:[[registrationResponse valueForKey:@"dev_mode"] boolValue]
          forKey:@"dev_mode"];
+
+        [AppLogger sharedInstance].doSendToRemote = [[NSUserDefaults standardUserDefaults] boolForKey:@"dev_mode"];
+
         [[NSUserDefaults standardUserDefaults]
          setObject:[registrationResponse valueForKey:@"shelter_id"]
          forKey:@"shelter_id"];
